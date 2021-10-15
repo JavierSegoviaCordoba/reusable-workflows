@@ -1,4 +1,4 @@
-name: build-renovate
+name: build-changelog-renovate
 
 on:
   workflow_call:
