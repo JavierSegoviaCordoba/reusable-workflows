@@ -17,8 +17,8 @@ on:
         required: true
 
 jobs:
-  build:
-    if: ${{ (github.actor != 'renovate[bot]') }}
+  jvm:
+    if: github.actor != 'renovate[bot]'
 
     runs-on: ubuntu-latest
 

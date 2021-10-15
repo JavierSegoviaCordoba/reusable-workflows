@@ -44,6 +44,7 @@ jobs:
           ./gradlew addChangelogItem --renovateCommitTable
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
+          git diff
           git add .
           git commit --amend --no-edit
           git push --force
