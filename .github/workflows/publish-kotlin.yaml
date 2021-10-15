@@ -1,7 +1,18 @@
-name: publish-gradle-plugins
+name: publish-kotlin
 
 on:
   workflow_call:
+    inputs:
+      machines:
+        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`. The first one will be used for one global time steps.'
+        default: 'ubuntu-latest'
+        required: true
+        type: string
+      gradle-plugin-portal:
+        description: 'If this is enabled, Gradle plugins are published to Gradle Plugin Portal and MavenCentral, if disabled, they are only published to MavenCentral'
+        default: false
+        required: false
+        type: boolean
     secrets:
       GITHUB_TOKEN:
         required: true
@@ -25,8 +36,29 @@ on:
         required: true
 
 jobs:
+  setup-matrix:
+    if: github.actor != 'renovate[bot]'
+    runs-on: 'ubuntu-latest'
+
+    outputs:
+      matrix: ${{ steps.setup-matrix.outputs.matrix }}
+
+    steps:
+      - name: Setup matrix
+        id: setup-matrix
+        run: |
+          MACHINES=$(echo "\"${{ inputs.machines }}\"" | tr -d '[:space:]' | sed 's/,/", "/g')
+          echo $MACHINES
+          echo "::set-output name=matrix::{\"os\": [$MACHINES]}"
+
   publish:
-    runs-on: ubuntu-latest
+    needs: setup-matrix
+
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
+
+    runs-on: '${{ matrix.os }}'
 
     env:
       OSS_USER: '${{ secrets.OSS_USER }}'
@@ -62,19 +94,11 @@ jobs:
           restore-keys: |
             gradle-${{ runner.os }}-
 
-      - name: pip cache
-        uses: actions/cache@v2
-        with:
-          path: ~/.cache/pip
-          key: ${{ runner.os }}-pip-${{ hashFiles('**/requirements.txt') }}
-          restore-keys: |
-            ${{ runner.os }}-pip-
-
       - name: Gradle build
         run: ./gradlew build
 
       - name: Generate Site docs
-        if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         run: ./gradlew buildDocs
 
       - name: Import GPG key
@@ -87,10 +111,11 @@ jobs:
         run: ./gradlew publishToSonatype closeSonatypeStagingRepository
 
       - name: Publish to Gradle Plugin Portal
+        if: ${{ inputs.gradle-plugin-portal == true }}
         run: ./gradlew publishPlugins -P"gradle.publish.key"="${{ secrets.GRADLE_PUBLISH_KEY }}" -P"gradle.publish.secret"="${{ secrets.GRADLE_PUBLISH_SECRET }}"
 
       - name: Deploy release docs to Github Pages
-        if: ${{ !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'

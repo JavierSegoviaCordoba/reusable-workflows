@@ -4,7 +4,7 @@ on:
   workflow_call:
     inputs:
       machines:
-        description: 'Virtual environments, default is `ubuntu-latest`. Set all machines separated by comma `ubuntu-latest, windows-latest`. The first one will be used for one global time steps.'
+        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`. The first one will be used for one global time steps.'
         default: 'ubuntu-latest'
         required: true
         type: string
