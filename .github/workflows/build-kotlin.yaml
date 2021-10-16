@@ -106,14 +106,16 @@ jobs:
         if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch') }}
         run: ./gradlew publishToSonatype -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
 
-      - name: Deploy snapshot docs to Github Pages
+      - name: Deploy docs to Github Pages
         if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
-          clean: false
           single-commit: true
+          clean: true
+          clean-exclude: |
+            api/versions/**
 
       - name: Stop Gradle daemons
         run: ./gradlew --stop
