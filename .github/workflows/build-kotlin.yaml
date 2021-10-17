@@ -60,7 +60,7 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@v2
+        uses: actions/checkout@v2.3.5
         with:
           fetch-depth: 0
 
@@ -71,7 +71,7 @@ jobs:
           java-version: 11
 
       - name: Gradle cache
-        uses: actions/cache@v2
+        uses: actions/cache@v2.1.6
         with:
           path: |
             ~/.gradle/caches
@@ -85,8 +85,14 @@ jobs:
         run: ./gradlew reckonTagCreate -P"reckon.stage"="final"
 
       - name: Gradle build
-        if: ${{ always() }}
         run: ./gradlew build ${{ inputs.gradle-args }} -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v2.2.4
+        with:
+          name: 'reports-${{ matrix.os }}'
+          path: '**/build/reports/**'
 
       - name: Generate code analysis reports
         if: ${{ always() }}
