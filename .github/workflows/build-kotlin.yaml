@@ -13,6 +13,11 @@ on:
         default: ''
         required: false
         type: string
+      gradle-args-publish-snapshot:
+        description: 'Gradle args for `Publish snapshot` step'
+        default: ''
+        required: false
+        type: string
       allow-github-actor-bots:
         description: 'Jobs are not executed if the GitHub Actor contains `[bot]` (for examples: `dependabot[bot]` and `renovate[`bot`])'
         default: true
@@ -110,7 +115,7 @@ jobs:
 
       - name: Publish snapshot
         if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch') }}
-        run: ./gradlew publishToSonatype -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
+        run: ./gradlew ${{ inputs.gradle-args-publish-snapshot }} publishToSonatype -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
 
       - name: Deploy docs to Github Pages
         if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
