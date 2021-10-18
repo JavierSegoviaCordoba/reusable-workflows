@@ -152,7 +152,7 @@ jobs:
           fi
 
       - name: Release
-        uses: anton-yurchenko/git-release@v4.1.0
+        uses: anton-yurchenko/git-release@v4.1.2
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           DRAFT_RELEASE: true
