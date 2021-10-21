@@ -4,9 +4,14 @@ on:
   workflow_call:
     inputs:
       machines:
-        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`. The first one will be used for one global time steps.'
+        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
         default: 'ubuntu-latest'
-        required: true
+        required: false
+        type: string
+      global-machine:
+        description: "Set the virtual environment that will run global steps that doesn't need all `machines`"
+        default: 'ubuntu-latest'
+        required: false
         type: string
       gradle-plugin-portal:
         description: 'If this is enabled, Gradle plugins are published to Gradle Plugin Portal and MavenCentral, if disabled, they are only published to MavenCentral'
@@ -99,7 +104,7 @@ jobs:
           arguments: build
 
       - name: Generate Site docs
-        if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: ${{ (matrix.os == inputs.global-machine) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: gradle/gradle-build-action@v2.0-beta.6
         with:
           arguments: buildDocs
@@ -129,7 +134,7 @@ jobs:
             -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
 
       - name: Deploy docs to Github Pages
-        if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: ${{ (matrix.os == inputs.global-machine) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'

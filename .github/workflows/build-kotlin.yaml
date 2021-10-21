@@ -4,9 +4,14 @@ on:
   workflow_call:
     inputs:
       machines:
-        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`. The first one will be used for one global time steps.'
+        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
         default: 'ubuntu-latest'
-        required: true
+        required: false
+        type: string
+      global-machine:
+        description: "Set the virtual environment that will run global steps that doesn't need all `machines`"
+        default: 'ubuntu-latest'
+        required: false
         type: string
       gradle-args:
         description: 'Gradle args for `build` step'
@@ -112,7 +117,7 @@ jobs:
           sarif_file: 'build/reports/detekt/detekt.sarif'
 
       - name: Generate docs
-        if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
+        if: ${{ (matrix.os == inputs.global-machine) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
         uses: gradle/gradle-build-action@v2.0-beta.6
         with:
           arguments: |
@@ -130,7 +135,7 @@ jobs:
             -Preckon.scope=patch
 
       - name: Deploy docs to Github Pages
-        if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
+        if: ${{ (matrix.os == inputs.global-machine) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'
