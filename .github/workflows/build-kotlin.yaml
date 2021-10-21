@@ -75,22 +75,19 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
       - name: Increment version
-        run: ./gradlew reckonTagCreate -P"reckon.stage"="final"
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: reckonTagCreate -Preckon.stage=final
 
-      - name: Gradle build
-        run: ./gradlew build ${{ inputs.gradle-args }} -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
+      - name: Build
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: |
+            build
+            ${{ inputs.gradle-args }}
+            -Preckon.stage=snapshot
+            -Preckon.scope=patch
 
       - name: Upload reports
         if: failure()
@@ -101,7 +98,12 @@ jobs:
 
       - name: Generate code analysis reports
         if: ${{ always() }}
-        run: ./gradlew detekt -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: |
+            detekt
+            -Preckon.stage=snapshot
+            -Preckon.scope=patch
 
       - name: Upload code analysis reports
         if: ${{ always() }}
@@ -111,11 +113,21 @@ jobs:
 
       - name: Generate docs
         if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
-        run: ./gradlew buildDocs -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: |
+            buildDocs
+            -Preckon.stage=snapshot
+            -Preckon.scope=patch
 
-      - name: Publish snapshot
-        if: ${{ (github.event_name == 'push') || (github.event_name == 'workflow_dispatch') }}
-        run: ./gradlew ${{ inputs.gradle-args-publish-snapshot }} publishToSonatype -P"reckon.stage"="snapshot" -P"reckon.scope"="patch"
+      - name: Generate snapshot
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: |
+            publishToSonatype
+            ${{ inputs.gradle-args-publish-snapshot }}
+            -Preckon.stage=snapshot
+            -Preckon.scope=patch
 
       - name: Deploy docs to Github Pages
         if: ${{ (matrix.os == fromJson(needs.setup-matrix.outputs.matrix).os[0]) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}

@@ -28,20 +28,13 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle cache
-        uses: actions/cache@v2.1.6
-        with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
       - name: Add updated dependencies to the CHANGELOG from Renovate
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: addChangelogItem --renovateCommitTable
+
+      - name: Commit and push
         run: |
-          ./gradlew addChangelogItem --renovateCommitTable
           git config --global user.email "action@github.com"
           git config --global user.name "GitHub Action"
           git diff

@@ -33,19 +33,13 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle cache
-        uses: actions/cache@v2.1.6
+      - name: Build
+        uses: gradle/gradle-build-action@v2.0-beta.6
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
-
-      - name: Gradle build
-        run: ./gradlew build -P"reckon.stage"="${{ inputs.stage }}" -P"reckon.scope"="${{ inputs.scope }}"
+          arguments: |
+            build
+            -Preckon.stage=${{ inputs.stage }}
+            -Preckon.scope=${{ inputs.scope }}
 
       - name: Upload reports
         if: failure()
@@ -79,27 +73,26 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Gradle cache
-        uses: actions/cache@v2.1.6
+      - name: Generate version
+        uses: gradle/gradle-build-action@v2.0-beta.6
         with:
-          path: |
-            ~/.gradle/caches
-            ~/.gradle/wrapper
-            ~/.konan
-          key: gradle-${{ runner.os }}-${{ hashFiles('**/*.gradle*', '**/gradle.properties', '**/gradle-wrapper.properties') }}
-          restore-keys: |
-            gradle-${{ runner.os }}-
+          arguments: -Preckon.stage=${{ inputs.stage }} -Preckon.scope=${{ inputs.scope }}
 
-      - name: Set version
+      - name: Set version to an environment variable
         id: versioning
-        run: |
-          ./gradlew -P"reckon.stage"="${{ inputs.stage }}" -P"reckon.scope"="${{ inputs.scope }}"
-          echo "lib_version=$(cat build/versioning/version.txt)" >> $GITHUB_ENV
+        run: echo "lib_version=$(cat build/versioning/version.txt)" >> $GITHUB_ENV
 
       - name: Patch Changelog and regenerate README badges
-        run: ./gradlew patchChangelog mergeChangelog buildReadmeBadges -P"reckon.stage"="${{ inputs.stage }}" -P"reckon.scope"="${{ inputs.scope }}"
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: |
+            patchChangelog
+            mergeChangelog
+            buildReadmeBadges
+            -Preckon.stage=${{ inputs.stage }}
+            -Preckon.scope=${{ inputs.scope }}
 
-      - name: Commit files
+      - name: Commit
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
@@ -108,9 +101,14 @@ jobs:
           git commit -m "Publish ${{ env.lib_version }}" -a
 
       - name: Generate Tag
-        run: ./gradlew reckonTagCreate -P"reckon.stage"="${{ inputs.stage }}" -P"reckon.scope"="${{ inputs.scope }}"
+        uses: gradle/gradle-build-action@v2.0-beta.6
+        with:
+          arguments: |
+            reckonTagCreate
+            -Preckon.stage=${{ inputs.stage }}
+            -Preckon.scope=${{ inputs.scope }}
 
-      - name: Push changes
+      - name: Push
         run: git push --follow-tags
 
       - name: Stop Gradle daemons
