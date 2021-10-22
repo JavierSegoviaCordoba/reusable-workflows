@@ -29,7 +29,7 @@ jobs:
           java-version: 11
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: addChangelogItem --renovateCommitTable
 

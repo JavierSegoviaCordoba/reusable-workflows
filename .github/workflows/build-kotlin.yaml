@@ -81,12 +81,12 @@ jobs:
           java-version: 11
 
       - name: Increment version
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: reckonTagCreate -Preckon.stage=final
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             build
@@ -103,7 +103,7 @@ jobs:
 
       - name: Generate code analysis reports
         if: ${{ always() }}
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             detekt
@@ -118,7 +118,7 @@ jobs:
 
       - name: Generate docs
         if: ${{ (matrix.os == inputs.global-machine) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             buildDocs
@@ -126,7 +126,7 @@ jobs:
             -Preckon.scope=patch
 
       - name: Generate snapshot
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             publishToSonatype

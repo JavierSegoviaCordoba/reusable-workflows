@@ -34,7 +34,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             build
@@ -74,7 +74,7 @@ jobs:
           java-version: 11
 
       - name: Generate version
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: -Preckon.stage=${{ inputs.stage }} -Preckon.scope=${{ inputs.scope }}
 
@@ -83,7 +83,7 @@ jobs:
         run: echo "lib_version=$(cat build/versioning/version.txt)" >> $GITHUB_ENV
 
       - name: Patch Changelog and regenerate README badges
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             patchChangelog
@@ -101,7 +101,7 @@ jobs:
           git commit -m "Publish ${{ env.lib_version }}" -a
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             reckonTagCreate

@@ -99,13 +99,13 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: build
 
       - name: Generate Site docs
         if: ${{ (matrix.os == inputs.global-machine) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: buildDocs
 
@@ -116,7 +116,7 @@ jobs:
           passphrase: ${{ secrets.SIGNING_KEY_PASSPHRASE }}
 
       - name: Publish to MavenCentral
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             publishToSonatype
@@ -125,7 +125,7 @@ jobs:
 
       - name: Publish to Gradle Plugin Portal
         if: ${{ inputs.gradle-plugin-portal == true }}
-        uses: gradle/gradle-build-action@v2.0-beta.6
+        uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
             publishPlugins
