@@ -5,7 +5,7 @@ on:
     inputs:
       machines:
         description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
-        default: 'ubuntu-latest'
+        default: 'macos-latest, ubuntu-latest, windows-latest'
         required: false
         type: string
       global-machine:
@@ -13,9 +13,24 @@ on:
         default: 'ubuntu-latest'
         required: false
         type: string
-      gradle-plugin-portal:
-        description: 'If this is enabled, Gradle plugins are published to Gradle Plugin Portal and MavenCentral, if disabled, they are only published to MavenCentral'
+      publish-maven-central:
+        description: 'If this is enabled, artifacts will be published to MavenCentral'
+        default: true
+        required: false
+        type: boolean
+      publish-gradle-plugin-portal:
+        description: 'If this is enabled, Gradle plugins are published to Gradle Plugin Portal'
         default: false
+        required: false
+        type: boolean
+      publish-jetbrains-marketplace:
+        description: 'If this is enabled, IntelliJ IDEA plugins are published to JetBrains marketplace'
+        default: false
+        required: false
+        type: boolean
+      publish-docs:
+        description: 'If this is enabled, docs are published to GitHub pages'
+        default: true
         required: false
         type: boolean
       gradle-args-publish-maven-central:
@@ -28,27 +43,45 @@ on:
         default: ''
         required: false
         type: string
+      gradle-args-publish-jetbrains-marketplace:
+        description: 'Gradle args for `Publish to JetBrains marketplace` step'
+        default: ''
+        required: false
+        type: string
+      publish-github-release:
+        description: 'If this is enabled, a release is published to GitHub'
+        default: true
+        required: false
+        type: boolean
     secrets:
       GITHUB_TOKEN:
-        required: true
+        required: false
       OSS_USER:
-        required: true
+        required: false
       OSS_TOKEN:
-        required: true
+        required: false
       OSS_STAGING_PROFILE_ID:
-        required: true
+        required: false
       SIGNING_KEY_NAME:
-        required: true
+        required: false
       SIGNING_KEY_ID:
-        required: true
+        required: false
       SIGNING_KEY_PASSPHRASE:
-        required: true
+        required: false
       SIGNING_KEY:
-        required: true
+        required: false
       GRADLE_PUBLISH_KEY:
-        required: true
+        required: false
       GRADLE_PUBLISH_SECRET:
-        required: true
+        required: false
+      JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN:
+        required: false
+      JETBRAINS_MARKETPLACE_KEY:
+        required: false
+      JETBRAINS_MARKETPLACE_KEY_PASSPHRASE:
+        required: false
+      JETBRAINS_MARKETPLACE_TOKEN:
+        required: false
 
 jobs:
   setup-matrix:
@@ -76,6 +109,7 @@ jobs:
     runs-on: '${{ matrix.os }}'
 
     env:
+      GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
       OSS_USER: '${{ secrets.OSS_USER }}'
       OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
       OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
@@ -85,6 +119,10 @@ jobs:
       SIGNING_KEY: '${{ secrets.SIGNING_KEY }}'
       GRADLE_PUBLISH_KEY: '${{ secrets.GRADLE_PUBLISH_KEY }}'
       GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
+      JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN: '${{ secrets.JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN }}'
+      JETBRAINS_MARKETPLACE_KEY: '${{ secrets.JETBRAINS_MARKETPLACE_KEY }}'
+      JETBRAINS_MARKETPLACE_KEY_PASSPHRASE: '${{ secrets.JETBRAINS_MARKETPLACE_KEY_PASSPHRASE }}'
+      JETBRAINS_MARKETPLACE_TOKEN: '${{ secrets.JETBRAINS_MARKETPLACE_TOKEN }}'
 
     steps:
       - name: Checkout
@@ -104,18 +142,20 @@ jobs:
           arguments: build
 
       - name: Generate Site docs
-        if: ${{ (matrix.os == inputs.global-machine) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: buildDocs
 
       - name: Import GPG key
+        if: ${{ inputs.publish-maven-central == true }}
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.SIGNING_KEY }}
           passphrase: ${{ secrets.SIGNING_KEY_PASSPHRASE }}
 
       - name: Publish to MavenCentral
+        if: ${{ inputs.publish-maven-central == true }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
@@ -124,7 +164,7 @@ jobs:
             ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Publish to Gradle Plugin Portal
-        if: ${{ inputs.gradle-plugin-portal == true }}
+        if: ${{ inputs.publish-gradle-plugin-portal == true }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
           arguments: |
@@ -133,8 +173,16 @@ jobs:
             -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }}
             -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
 
+      - name: Publish to JetBrains marketplace
+        if: ${{ inputs.publish-jetbrains-marketplace == true }}
+        uses: gradle/gradle-build-action@v2.0-beta.7
+        with:
+          arguments: |
+            publishPlugin
+            ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
+
       - name: Deploy docs to Github Pages
-        if: ${{ (matrix.os == inputs.global-machine) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'
@@ -148,6 +196,7 @@ jobs:
         run: ./gradlew --stop
 
   github-release:
+    if: ${{ (inputs.publish-github-release == true) }}
     runs-on: ubuntu-latest
 
     needs:

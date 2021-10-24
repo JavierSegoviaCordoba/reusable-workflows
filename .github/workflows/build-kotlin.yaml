@@ -5,7 +5,7 @@ on:
     inputs:
       machines:
         description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
-        default: 'ubuntu-latest'
+        default: 'macos-latest, ubuntu-latest, windows-latest'
         required: false
         type: string
       global-machine:
@@ -40,11 +40,11 @@ on:
         type: boolean
     secrets:
       OSS_USER:
-        required: true
+        required: false
       OSS_TOKEN:
-        required: true
+        required: false
       OSS_STAGING_PROFILE_ID:
-        required: true
+        required: false
 
 jobs:
   setup-matrix:
