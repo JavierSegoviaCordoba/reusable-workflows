@@ -3,6 +3,11 @@ name: generate-version-tag
 on:
   workflow_call:
     inputs:
+      machines:
+        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
+        default: 'ubuntu-latest'
+        required: false
+        type: string
       stage:
         description: 'Stage, one of [alpha, beta, rc, final]'
         default: 'alpha'
@@ -18,8 +23,29 @@ on:
         required: true
 
 jobs:
+  setup-matrix:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    runs-on: 'ubuntu-latest'
+
+    outputs:
+      matrix: ${{ steps.setup-matrix.outputs.matrix }}
+
+    steps:
+      - name: Setup matrix
+        id: setup-matrix
+        run: |
+          MACHINES=$(echo "\"${{ inputs.machines }}\"" | tr -d '[:space:]' | sed 's/,/", "/g')
+          echo $MACHINES
+          echo "::set-output name=matrix::{\"os\": [$MACHINES]}"  
+
   build:
-    runs-on: ubuntu-latest
+    needs: setup-matrix
+
+    strategy:
+      fail-fast: false
+      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
+
+    runs-on: '${{ matrix.os }}'
 
     steps:
       - name: Checkout
