@@ -236,4 +236,4 @@ jobs:
           DRAFT_RELEASE: true
           PRE_RELEASE: '${{ steps.pre_release.outputs.is_pre_release }}'
           CHANGELOG_FILE: 'CHANGELOG.md'
-          ALLOW_EMPTY_CHANGELOG: false
+          ALLOW_EMPTY_CHANGELOG: true
