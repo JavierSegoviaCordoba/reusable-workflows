@@ -18,6 +18,11 @@ on:
         default: ''
         required: false
         type: string
+      gradle-cache-disabled:
+        description: 'If this is enabled, Gradle caches'
+        default: false
+        required: false
+        type: boolean
     secrets:
       TOKEN_GITHUB_ACTION:
         required: true
@@ -62,6 +67,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
             build
             -Preckon.stage=${{ inputs.stage }}
@@ -102,6 +108,7 @@ jobs:
       - name: Generate version
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: -Preckon.stage=${{ inputs.stage }} -Preckon.scope=${{ inputs.scope }}
 
       - name: Set version to an environment variable
@@ -111,6 +118,7 @@ jobs:
       - name: Patch Changelog and regenerate README badges
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
             patchChangelog
             mergeChangelog
@@ -129,6 +137,7 @@ jobs:
       - name: Generate Tag
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
             reckonTagCreate
             -Preckon.stage=${{ inputs.stage }}

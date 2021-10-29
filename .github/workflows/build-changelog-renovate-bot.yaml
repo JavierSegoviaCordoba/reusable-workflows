@@ -2,6 +2,12 @@ name: build-changelog-renovate
 
 on:
   workflow_call:
+    inputs:
+      gradle-cache-disabled:
+        description: 'If this is enabled, Gradle caches'
+        default: false
+        required: false
+        type: boolean
     secrets:
       TOKEN_GITHUB_ACTION:
         required: true
@@ -31,6 +37,7 @@ jobs:
       - name: Add updated dependencies to the CHANGELOG from Renovate
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: addChangelogItem --renovateCommitTable
 
       - name: Commit and push

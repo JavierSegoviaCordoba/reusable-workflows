@@ -53,6 +53,11 @@ on:
         default: true
         required: false
         type: boolean
+      gradle-cache-disabled:
+        description: 'If this is enabled, Gradle caches'
+        default: false
+        required: false
+        type: boolean
     secrets:
       GITHUB_TOKEN:
         required: false
@@ -139,12 +144,14 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: build
 
       - name: Generate Site docs
         if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: buildDocs
 
       - name: Import GPG key
@@ -158,6 +165,7 @@ jobs:
         if: ${{ inputs.publish-maven-central == true }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
             publishToSonatype
             closeSonatypeStagingRepository
@@ -167,6 +175,7 @@ jobs:
         if: ${{ inputs.publish-gradle-plugin-portal == true }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
             publishPlugins
             ${{ inputs.gradle-args-publish-gradle-plugin-portal }}
@@ -177,6 +186,7 @@ jobs:
         if: ${{ inputs.publish-jetbrains-marketplace == true }}
         uses: gradle/gradle-build-action@v2.0-beta.7
         with:
+          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
