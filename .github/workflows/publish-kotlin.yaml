@@ -14,22 +14,22 @@ on:
         required: false
         type: string
       publish-maven-central:
-        description: 'If this is enabled, artifacts will be published to MavenCentral'
+        description: 'Publish artifacts to MavenCentral'
         default: true
         required: false
         type: boolean
       publish-gradle-plugin-portal:
-        description: 'If this is enabled, Gradle plugins are published to Gradle Plugin Portal'
+        description: 'Publish Gradle plugins to Gradle Plugin Portal'
         default: false
         required: false
         type: boolean
       publish-jetbrains-marketplace:
-        description: 'If this is enabled, IntelliJ IDEA plugins are published to JetBrains marketplace'
+        description: 'Publish IntelliJ IDEA plugins to JetBrains marketplace'
         default: false
         required: false
         type: boolean
       publish-docs:
-        description: 'If this is enabled, docs are published to GitHub pages'
+        description: 'Publish docs to GitHub pages'
         default: true
         required: false
         type: boolean
@@ -49,12 +49,12 @@ on:
         required: false
         type: string
       publish-github-release:
-        description: 'If this is enabled, a release is published to GitHub'
+        description: 'Publish GitHub release'
         default: true
         required: false
         type: boolean
-      gradle-cache-disabled:
-        description: 'If this is enabled, Gradle caches'
+      gradle-cache:
+        description: 'Use Gradle cache'
         default: false
         required: false
         type: boolean
@@ -144,14 +144,14 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.0.0
         with:
-          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
+          cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: build
 
       - name: Generate Site docs
         if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
         uses: gradle/gradle-build-action@v2.0.0
         with:
-          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
+          cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: buildDocs
 
       - name: Import GPG key
@@ -165,7 +165,7 @@ jobs:
         if: ${{ inputs.publish-maven-central == true }}
         uses: gradle/gradle-build-action@v2.0.0
         with:
-          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
+          cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             publishToSonatype
             closeSonatypeStagingRepository
@@ -175,7 +175,7 @@ jobs:
         if: ${{ inputs.publish-gradle-plugin-portal == true }}
         uses: gradle/gradle-build-action@v2.0.0
         with:
-          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
+          cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             publishPlugins
             ${{ inputs.gradle-args-publish-gradle-plugin-portal }}
@@ -186,7 +186,7 @@ jobs:
         if: ${{ inputs.publish-jetbrains-marketplace == true }}
         uses: gradle/gradle-build-action@v2.0.0
         with:
-          cache-disabled: '${{ inputs.gradle-cache-disabled }}'
+          cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
