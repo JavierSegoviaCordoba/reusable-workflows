@@ -142,14 +142,14 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0-rc.2
+        uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: build
 
       - name: Generate Site docs
         if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
-        uses: gradle/gradle-build-action@v2.0-rc.2
+        uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: buildDocs
@@ -163,7 +163,7 @@ jobs:
 
       - name: Publish to MavenCentral
         if: ${{ inputs.publish-maven-central == true }}
-        uses: gradle/gradle-build-action@v2.0-rc.2
+        uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
@@ -173,7 +173,7 @@ jobs:
 
       - name: Publish to Gradle Plugin Portal
         if: ${{ inputs.publish-gradle-plugin-portal == true }}
-        uses: gradle/gradle-build-action@v2.0-rc.2
+        uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
@@ -184,7 +184,7 @@ jobs:
 
       - name: Publish to JetBrains marketplace
         if: ${{ inputs.publish-jetbrains-marketplace == true }}
-        uses: gradle/gradle-build-action@v2.0-rc.2
+        uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ inputs.gradle-cache-disabled }}'
           arguments: |
