@@ -95,12 +95,6 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Increment version
-        uses: gradle/gradle-build-action@v2.0.0
-        with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
-          arguments: reckonTagCreate -Preckon.stage=final
-
       - name: Build
         uses: gradle/gradle-build-action@v2.0.0
         with:
@@ -108,8 +102,7 @@ jobs:
           arguments: |
             build
             ${{ inputs.gradle-args }}
-            -Preckon.stage=snapshot
-            -Preckon.scope=patch
+            -Psemver.stage=snapshot
 
       - name: Upload reports
         if: failure()
@@ -125,8 +118,7 @@ jobs:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             detekt
-            -Preckon.stage=snapshot
-            -Preckon.scope=patch
+            -Psemver.stage=snapshot
 
       - name: Upload code analysis reports
         if: ${{ always() }}
@@ -141,8 +133,7 @@ jobs:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             buildDocs
-            -Preckon.stage=snapshot
-            -Preckon.scope=patch
+            -Psemver.stage=snapshot
 
       - name: Generate snapshot
         if: ${{ (inputs.publish-snapshot == true) }}
@@ -152,8 +143,7 @@ jobs:
           arguments: |
             publishToSonatype
             ${{ inputs.gradle-args-publish-snapshot }}
-            -Preckon.stage=snapshot
-            -Preckon.scope=patch
+            -Psemver.stage=snapshot
 
       - name: Deploy docs to Github Pages
         if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}

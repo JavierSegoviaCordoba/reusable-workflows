@@ -9,13 +9,13 @@ on:
         required: false
         type: string
       stage:
-        description: 'Stage (alpha, beta, rc, final)'
-        default: 'alpha'
+        description: 'Stage [alpha, beta, rc, final, auto]'
+        default: 'auto'
         required: true
         type: string
       scope:
-        description: 'Scope (major, minor, patch, auto) or empty'
-        default: ''
+        description: 'Scope [patch, minor, major, auto]'
+        default: 'auto'
         required: true
         type: string
       gradle-cache:
@@ -70,8 +70,8 @@ jobs:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             build
-            -Preckon.stage=${{ inputs.stage }}
-            -Preckon.scope=${{ inputs.scope }}
+            -Psemver.stage=${{ inputs.stage }}
+            -Psemver.scope=${{ inputs.scope }}
 
       - name: Upload reports
         if: failure()
@@ -109,11 +109,11 @@ jobs:
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
-          arguments: -Preckon.stage=${{ inputs.stage }} -Preckon.scope=${{ inputs.scope }}
+          arguments: -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Set version to an environment variable
         id: versioning
-        run: echo "lib_version=$(cat build/versioning/version.txt)" >> $GITHUB_ENV
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
 
       - name: Patch Changelog and regenerate README badges
         uses: gradle/gradle-build-action@v2.0.0
@@ -123,8 +123,8 @@ jobs:
             patchChangelog
             mergeChangelog
             buildReadmeBadges
-            -Preckon.stage=${{ inputs.stage }}
-            -Preckon.scope=${{ inputs.scope }}
+            -Psemver.stage=${{ inputs.stage }}
+            -Psemver.scope=${{ inputs.scope }}
 
       - name: Commit
         run: |
@@ -139,9 +139,9 @@ jobs:
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
-            reckonTagCreate
-            -Preckon.stage=${{ inputs.stage }}
-            -Preckon.scope=${{ inputs.scope }}
+            createSemverTag
+            -Psemver.stage=${{ inputs.stage }}
+            -Psemver.scope=${{ inputs.scope }}
 
       - name: Push
         run: git push --follow-tags
