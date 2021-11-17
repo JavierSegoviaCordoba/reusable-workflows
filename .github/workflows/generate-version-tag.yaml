@@ -53,6 +53,9 @@ jobs:
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
 
+      - name: Set version to an environment variable
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+
       - name: Upload reports
         if: failure()
         uses: actions/upload-artifact@v2.2.4
@@ -71,6 +74,14 @@ jobs:
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
 
+      - name: Commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git diff
+          git add .
+          git commit -m "Publish ${{ env.lib_version }}" -a
+
       - name: Generate Tag
         uses: gradle/gradle-build-action@v2.0.1
         with:
@@ -79,17 +90,6 @@ jobs:
             createSemverTag
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
-
-      - name: Set version to an environment variable
-        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
-
-      - name: Commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git diff
-          git add .
-          git commit -m "Publish ${{ env.lib_version }}" -a
 
       - name: Push
         run: git push --follow-tags
