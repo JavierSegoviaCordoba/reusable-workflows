@@ -45,7 +45,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0.0
+        uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
@@ -61,7 +61,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Patch Changelog and regenerate README badges
-        uses: gradle/gradle-build-action@v2.0.0
+        uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
@@ -72,7 +72,7 @@ jobs:
             -Psemver.scope=${{ inputs.scope }}
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.0.0
+        uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
