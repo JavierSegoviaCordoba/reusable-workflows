@@ -3,11 +3,6 @@ name: generate-version-tag
 on:
   workflow_call:
     inputs:
-      machines:
-        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
-        default: 'ubuntu-latest'
-        required: false
-        type: string
       stage:
         description: 'Stage [alpha, beta, rc, final, auto]'
         default: 'auto'
@@ -28,35 +23,20 @@ on:
         required: true
 
 jobs:
-  setup-matrix:
+  generate-version-tag:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
-    runs-on: 'ubuntu-latest'
 
-    outputs:
-      matrix: ${{ steps.setup-matrix.outputs.matrix }}
+    runs-on: 'macos-latest'
 
-    steps:
-      - name: Setup matrix
-        id: setup-matrix
-        run: |
-          MACHINES=$(echo "\"${{ inputs.machines }}\"" | tr -d '[:space:]' | sed 's/,/", "/g')
-          echo $MACHINES
-          echo "::set-output name=matrix::{\"os\": [$MACHINES]}"  
-
-  build:
-    needs: setup-matrix
-
-    strategy:
-      fail-fast: false
-      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
-
-    runs-on: '${{ matrix.os }}'
+    env:
+      GITHUB_TOKEN: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
         with:
           fetch-depth: 0
+          token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
       - name: Set up Java
         uses: actions/setup-java@v2.3.1
@@ -80,41 +60,6 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  generate-tag:
-    runs-on: ubuntu-latest
-
-    needs:
-      - build
-
-    env:
-      GITHUB_TOKEN: '${{ secrets.TOKEN_GITHUB_ACTION }}'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.4.0
-        with:
-          fetch-depth: 0
-          token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
-
-      - name: Set up Java
-        uses: actions/setup-java@v2.3.1
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Generate version
-        uses: gradle/gradle-build-action@v2.0.0
-        with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
-          arguments: -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
-
-      - name: Set version to an environment variable
-        id: versioning
-        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
-
       - name: Patch Changelog and regenerate README badges
         uses: gradle/gradle-build-action@v2.0.0
         with:
@@ -126,14 +71,6 @@ jobs:
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
 
-      - name: Commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git diff
-          git add .
-          git commit -m "Publish ${{ env.lib_version }}" -a
-
       - name: Generate Tag
         uses: gradle/gradle-build-action@v2.0.0
         with:
@@ -142,6 +79,17 @@ jobs:
             createSemverTag
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
+
+      - name: Set version to an environment variable
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+
+      - name: Commit
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git diff
+          git add .
+          git commit -m "Publish ${{ env.lib_version }}" -a
 
       - name: Push
         run: git push --follow-tags

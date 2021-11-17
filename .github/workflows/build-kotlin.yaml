@@ -3,16 +3,6 @@ name: build-kotlin
 on:
   workflow_call:
     inputs:
-      machines:
-        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
-        default: 'macos-latest, ubuntu-latest, windows-latest'
-        required: false
-        type: string
-      global-machine:
-        description: "Set the virtual environment that will run global steps that doesn't need all `machines`"
-        default: 'ubuntu-latest'
-        required: false
-        type: string
       gradle-args:
         description: 'Gradle args for `build` step'
         default: ''
@@ -52,31 +42,10 @@ on:
         required: false
 
 jobs:
-  setup-matrix:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
-    runs-on: 'ubuntu-latest'
-
-    outputs:
-      matrix: ${{ steps.setup-matrix.outputs.matrix }}
-
-    steps:
-      - name: Setup matrix
-        id: setup-matrix
-        run: |
-          MACHINES=$(echo "\"${{ inputs.machines }}\"" | tr -d '[:space:]' | sed 's/,/", "/g')
-          echo $MACHINES
-          echo "::set-output name=matrix::{\"os\": [$MACHINES]}"
-
   build:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
-    needs: setup-matrix
-
-    strategy:
-      fail-fast: false
-      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
-
-    runs-on: '${{ matrix.os }}'
+    runs-on: 'macos-latest'
 
     env:
       OSS_USER: '${{ secrets.OSS_USER }}'
@@ -127,7 +96,7 @@ jobs:
           sarif_file: 'build/reports/detekt/detekt.sarif'
 
       - name: Generate docs
-        if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
+        if: (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
@@ -136,7 +105,7 @@ jobs:
             -Psemver.stage=snapshot
 
       - name: Generate snapshot
-        if: ${{ (inputs.publish-snapshot == true) }}
+        if: (inputs.publish-snapshot == true)
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
@@ -146,7 +115,7 @@ jobs:
             -Psemver.stage=snapshot
 
       - name: Deploy docs to Github Pages
-        if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) }}
+        if: (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'

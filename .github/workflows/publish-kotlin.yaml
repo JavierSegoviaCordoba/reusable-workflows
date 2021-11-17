@@ -3,16 +3,6 @@ name: publish-kotlin
 on:
   workflow_call:
     inputs:
-      machines:
-        description: 'Virtual environments. Set all machines separated by comma, for example: `ubuntu-latest, windows-latest`'
-        default: 'macos-latest, ubuntu-latest, windows-latest'
-        required: false
-        type: string
-      global-machine:
-        description: "Set the virtual environment that will run global steps that doesn't need all `machines`"
-        default: 'ubuntu-latest'
-        required: false
-        type: string
       publish-maven-central:
         description: 'Publish artifacts to MavenCentral'
         default: true
@@ -89,29 +79,26 @@ on:
         required: false
 
 jobs:
-  setup-matrix:
+  build:
     if: github.actor != 'renovate[bot]'
-    runs-on: 'ubuntu-latest'
 
-    outputs:
-      matrix: ${{ steps.setup-matrix.outputs.matrix }}
-
-    steps:
-      - name: Setup matrix
-        id: setup-matrix
-        run: |
-          MACHINES=$(echo "\"${{ inputs.machines }}\"" | tr -d '[:space:]' | sed 's/,/", "/g')
-          echo $MACHINES
-          echo "::set-output name=matrix::{\"os\": [$MACHINES]}"
-
-  publish:
-    needs: setup-matrix
+    runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
-      matrix: ${{fromJson(needs.setup-matrix.outputs.matrix)}}
+      matrix:
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
 
-    runs-on: '${{ matrix.os }}'
+    steps:
+      - name: Build
+        uses: gradle/gradle-build-action@v2.0.0
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: build
+
+  publish:
+    needs: build
+
+    runs-on: 'macos-latest'
 
     env:
       GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
@@ -148,21 +135,21 @@ jobs:
           arguments: build
 
       - name: Generate Site docs
-        if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: buildDocs
 
       - name: Import GPG key
-        if: ${{ inputs.publish-maven-central == true }}
+        if: (inputs.publish-maven-central == true)
         uses: crazy-max/ghaction-import-gpg@v4
         with:
           gpg_private_key: ${{ secrets.SIGNING_KEY }}
           passphrase: ${{ secrets.SIGNING_KEY_PASSPHRASE }}
 
       - name: Publish to MavenCentral
-        if: ${{ inputs.publish-maven-central == true }}
+        if: (inputs.publish-maven-central == true)
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
@@ -172,7 +159,7 @@ jobs:
             ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Publish to Gradle Plugin Portal
-        if: ${{ inputs.publish-gradle-plugin-portal == true }}
+        if: (inputs.publish-gradle-plugin-portal == true)
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
@@ -183,7 +170,7 @@ jobs:
             -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
 
       - name: Publish to JetBrains marketplace
-        if: ${{ inputs.publish-jetbrains-marketplace == true }}
+        if: (inputs.publish-jetbrains-marketplace == true)
         uses: gradle/gradle-build-action@v2.0.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
@@ -192,7 +179,7 @@ jobs:
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
 
       - name: Deploy docs to Github Pages
-        if: ${{ (matrix.os == inputs.global-machine) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') }}
+        if: (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
         uses: JamesIves/github-pages-deploy-action@4.1.5
         with:
           branch: 'gh-pages'
@@ -202,38 +189,14 @@ jobs:
           clean-exclude: |
             api/versions/**
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
-  github-release:
-    if: ${{ (inputs.publish-github-release == true) }}
-    runs-on: ubuntu-latest
-
-    needs:
-      - publish
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v2.4.0
-        with:
-          fetch-depth: 0
-
-      - name: Set pre-release
-        shell: bash
-        id: pre_release
-        run: |
-          if [[ ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }} ]]
-          then
-            echo ::set-output name=is_pre_release::true
-          else
-            echo ::set-output name=is_pre_release::false
-          fi
-
       - name: Release
         uses: anton-yurchenko/git-release@v4.1.2
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          DRAFT_RELEASE: true
-          PRE_RELEASE: '${{ steps.pre_release.outputs.is_pre_release }}'
+          DRAFT_RELEASE: false
+          PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
           CHANGELOG_FILE: 'CHANGELOG.md'
           ALLOW_EMPTY_CHANGELOG: true
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop

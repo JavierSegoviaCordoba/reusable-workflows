@@ -16,7 +16,7 @@ jobs:
   add-updated-dependencies-to-changelog:
     if: github.actor == 'renovate[bot]'
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
 
     env:
       GITHUB_TOKEN: '${{ secrets.TOKEN_GITHUB_ACTION }}'
