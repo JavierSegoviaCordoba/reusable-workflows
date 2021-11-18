@@ -212,7 +212,23 @@ jobs:
           clean-exclude: |
             api/versions/**
 
-      - name: Release
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
+  github-release:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+
+    needs: publish
+
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Publish GitHub Release
         uses: anton-yurchenko/git-release@v4.1.2
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
@@ -220,6 +236,3 @@ jobs:
           PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
           CHANGELOG_FILE: 'CHANGELOG.md'
           ALLOW_EMPTY_CHANGELOG: true
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
