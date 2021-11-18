@@ -45,12 +45,11 @@ jobs:
   build:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
-    runs-on: 'macos-latest'
+    runs-on: ${{ matrix.os }}
 
-    env:
-      OSS_USER: '${{ secrets.OSS_USER }}'
-      OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
-      OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
+    strategy:
+      matrix:
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
 
     steps:
       - name: Checkout
@@ -94,6 +93,33 @@ jobs:
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: 'build/reports/detekt/detekt.sarif'
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
+
+  publish-snapshot:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+
+    needs: build
+
+    runs-on: 'ubuntu-latest'
+
+    env:
+      OSS_USER: '${{ secrets.OSS_USER }}'
+      OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
+      OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.3.1
+        with:
+          distribution: 'zulu'
+          java-version: 11
 
       - name: Generate docs
         if: (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))

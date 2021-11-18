@@ -48,3 +48,6 @@ jobs:
           git add .
           git commit --amend --no-edit
           git push --force
+
+      - name: Stop Gradle daemons
+        run: ./gradlew --stop
