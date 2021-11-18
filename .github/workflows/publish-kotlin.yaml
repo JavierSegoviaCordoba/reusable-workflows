@@ -45,7 +45,7 @@ on:
         type: boolean
       gradle-cache:
         description: 'Use Gradle cache'
-        default: false
+        default: true
         required: false
         type: boolean
     secrets:
