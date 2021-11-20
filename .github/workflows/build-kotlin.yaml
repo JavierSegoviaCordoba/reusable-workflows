@@ -98,7 +98,7 @@ jobs:
         run: ./gradlew --stop
 
   publish-snapshot:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))
 
     needs: build
 
@@ -122,7 +122,7 @@ jobs:
           java-version: 11
 
       - name: Generate docs
-        if: (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))
+        if: (inputs.publish-docs == true)
         uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
@@ -141,7 +141,7 @@ jobs:
             -Psemver.stage=snapshot
 
       - name: Deploy docs to Github Pages
-        if: (inputs.publish-docs == true) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))
+        if: (inputs.publish-docs == true)
         uses: JamesIves/github-pages-deploy-action@4.1.6
         with:
           branch: 'gh-pages'
