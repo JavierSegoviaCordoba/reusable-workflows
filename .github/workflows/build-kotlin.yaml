@@ -130,7 +130,7 @@ jobs:
             buildDocs
             -Psemver.stage=snapshot
 
-      - name: Generate snapshot
+      - name: Publish snapshot
         if: (inputs.publish-snapshot == true)
         uses: gradle/gradle-build-action@v2.0.1
         with:
