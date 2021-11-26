@@ -203,7 +203,7 @@ jobs:
 
       - name: Deploy docs to Github Pages
         if: (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
-        uses: JamesIves/github-pages-deploy-action@4.1.6
+        uses: JamesIves/github-pages-deploy-action@4.1.7
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
