@@ -178,7 +178,7 @@ jobs:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             publishToSonatype
-            closeSonatypeStagingRepository
+            closeAndReleaseSonatypeStagingRepository
             ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Publish to Gradle Plugin Portal
