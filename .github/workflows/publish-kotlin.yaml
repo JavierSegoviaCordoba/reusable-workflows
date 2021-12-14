@@ -49,7 +49,7 @@ on:
         required: false
         type: boolean
     secrets:
-      GITHUB_TOKEN:
+      TOKEN_GITHUB_ACTION:
         required: false
       OSS_USER:
         required: false
@@ -124,7 +124,7 @@ jobs:
     runs-on: 'macos-latest'
 
     env:
-      GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+      TOKEN_GITHUB_ACTION: '${{ secrets.TOKEN_GITHUB_ACTION }}'
       OSS_USER: '${{ secrets.OSS_USER }}'
       OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
       OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
@@ -232,7 +232,7 @@ jobs:
       - name: Publish GitHub Release
         uses: anton-yurchenko/git-release@v4.2.0
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          GITHUB_TOKEN: '${{ secrets.TOKEN_GITHUB_ACTION }}'
           DRAFT_RELEASE: false
           PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
           CHANGELOG_FILE: 'CHANGELOG.md'

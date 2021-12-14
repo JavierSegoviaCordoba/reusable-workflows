@@ -28,9 +28,6 @@ jobs:
 
     runs-on: 'macos-latest'
 
-    env:
-      GITHUB_TOKEN: '${{ secrets.TOKEN_GITHUB_ACTION }}'
-
     steps:
       - name: Checkout
         uses: actions/checkout@v2.4.0
