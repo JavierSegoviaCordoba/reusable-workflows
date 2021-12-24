@@ -4,7 +4,67 @@ on:
   workflow_call:
     inputs:
       gradle-args:
-        description: 'Gradle args for `build` step'
+        description: 'Gradle args for every steps'
+        default: ''
+        required: false
+        type: string
+      all-tests:
+        description: 'Enable running all tests'
+        default: true
+        required: false
+        type: boolean
+      gradle-args-all-tests:
+        description: 'Gradle args for `All tests` step'
+        default: ''
+        required: false
+        type: string
+      api-check:
+        description: 'Enable checking API changes'
+        default: true
+        required: false
+        type: boolean
+      gradle-args-api-check:
+        description: 'Gradle args for `Check API` step'
+        default: ''
+        required: false
+        type: string
+      assemble:
+        description: 'Enable running assemble'
+        default: true
+        required: false
+        type: boolean
+      gradle-args-assemble:
+        description: 'Gradle args for `Assemble` step'
+        default: ''
+        required: false
+        type: string
+      code-analysis-check:
+        description: 'Enable code analysis'
+        default: true
+        required: false
+        type: boolean
+      gradle-args-code-analysis-check:
+        description: 'Gradle args for `Code analysis` step'
+        default: ''
+        required: false
+        type: string
+      code-format-check:
+        description: 'Enable checking code format'
+        default: true
+        required: false
+        type: boolean
+      gradle-args-code-format-check:
+        description: 'Gradle args for `Code format` step'
+        default: ''
+        required: false
+        type: string
+      code-quality-check:
+        description: 'Enable code quality'
+        default: true
+        required: false
+        type: boolean
+      gradle-args-build-docs:
+        description: 'Gradle args for `Generate docs` step'
         default: ''
         required: false
         type: string
@@ -42,8 +102,8 @@ on:
         required: false
 
 jobs:
-  build:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+  all-tests:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.all-tests)
 
     runs-on: ${{ matrix.os }}
 
@@ -63,12 +123,13 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
+      - name: All tests
         uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
-            build
+            allTests
+            ${{ inputs.gradle-args-all-tests }}
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
 
@@ -79,28 +140,185 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Generate code analysis reports
-        if: ${{ always() }}
+  api-check:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.api-check == true)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Check API
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: |
+            apiCheck
+            ${{ inputs.gradle-args-api-check }}
+            ${{ inputs.gradle-args }}
+            -Psemver.stage=snapshot
+
+  assemble:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.assemble == true)
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Assemble
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: |
+            assemble
+            ${{ inputs.gradle-args-assemble }}
+            ${{ inputs.gradle-args }}
+            -Psemver.stage=snapshot
+
+  code-analysis-check:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-analysis-check == true)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Code analysis
         uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             detekt
+            ${{ inputs.gradle-args-code-analysis-check }}
+            ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
 
       - name: Upload code analysis reports
-        if: ${{ always() }}
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: 'build/reports/detekt/detekt.sarif'
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
+  code-format-check:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-format-check == true)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Code format
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: |
+            spotlessCheck
+            ${{ inputs.gradle-args-code-format-check }}
+            ${{ inputs.gradle-args }}
+            -Psemver.stage=snapshot
+
+  code-quality-check:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Code quality
+        uses: JetBrains/qodana-action@v4.1.1
+        with:
+          linter: jetbrains/qodana-jvm-android
 
   publish-snapshot:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch'))
+    if: |
+      !cancelled() && !failure() &&
+      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-snapshot == true))
 
-    needs: build
+    needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
+
+    runs-on: 'macos-latest'
+
+    env:
+      OSS_USER: '${{ secrets.OSS_USER }}'
+      OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
+      OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Publish snapshot
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: |
+            publishToSonatype
+            ${{ inputs.gradle-args-publish-snapshot }}
+            ${{ inputs.gradle-args }}
+            -Psemver.stage=snapshot
+
+  deploy-docs:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-docs == true)
+
+    needs: publish-snapshot
 
     runs-on: 'ubuntu-latest'
 
@@ -122,26 +340,16 @@ jobs:
           java-version: 11
 
       - name: Generate docs
-        if: (inputs.publish-docs == true)
         uses: gradle/gradle-build-action@v2.0.1
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             buildDocs
-            -Psemver.stage=snapshot
-
-      - name: Publish snapshot
-        if: (inputs.publish-snapshot == true)
-        uses: gradle/gradle-build-action@v2.0.1
-        with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
-          arguments: |
-            publishToSonatype
-            ${{ inputs.gradle-args-publish-snapshot }}
+            ${{ inputs.gradle-args-build-docs }}
+            ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
 
       - name: Deploy docs to GitHub Pages
-        if: (inputs.publish-docs == true)
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
           branch: 'gh-pages'
@@ -150,6 +358,3 @@ jobs:
           clean: true
           clean-exclude: |
             api/versions/**
-
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
