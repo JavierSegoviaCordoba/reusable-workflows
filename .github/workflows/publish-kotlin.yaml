@@ -220,6 +220,7 @@ jobs:
           clean: true
           clean-exclude: |
             api/versions/**
+            reports
 
   github-release:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true)

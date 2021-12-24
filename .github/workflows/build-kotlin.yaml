@@ -279,6 +279,15 @@ jobs:
         with:
           linter: jetbrains/qodana-jvm-android
 
+      - name: Deploy code quality to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: ${{ runner.temp }}/qodana/results/report
+          clean: false
+          single-commit: true
+          target-folder: reports/code-quality
+
   publish-snapshot:
     if: |
       !cancelled() && !failure() &&
@@ -358,3 +367,4 @@ jobs:
           clean: true
           clean-exclude: |
             api/versions/**
+            reports
