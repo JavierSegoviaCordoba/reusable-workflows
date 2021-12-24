@@ -140,7 +140,7 @@ jobs:
             ${{ inputs.gradle-args-publish-snapshot }}
             -Psemver.stage=snapshot
 
-      - name: Deploy docs to Github Pages
+      - name: Deploy docs to GitHub Pages
         if: (inputs.publish-docs == true)
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:

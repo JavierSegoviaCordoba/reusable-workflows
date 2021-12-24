@@ -196,7 +196,7 @@ jobs:
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
 
-      - name: Deploy docs to Github Pages
+      - name: Deploy docs to GitHub Pages
         if: (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
