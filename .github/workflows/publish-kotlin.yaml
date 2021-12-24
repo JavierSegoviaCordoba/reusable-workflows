@@ -113,9 +113,6 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
@@ -150,13 +147,6 @@ jobs:
         with:
           distribution: 'zulu'
           java-version: 11
-
-      - name: Generate Site docs
-        if: (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
-        uses: gradle/gradle-build-action@v2.0.1
-        with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
-          arguments: buildDocs
 
       - name: Import GPG key
         if: (inputs.publish-maven-central == true)
@@ -196,8 +186,32 @@ jobs:
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
 
+  deploy-docs:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
+
+    needs: publish
+
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Generate Site docs
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: buildDocs
+
       - name: Deploy docs to GitHub Pages
-        if: (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
           branch: 'gh-pages'
@@ -207,11 +221,8 @@ jobs:
           clean-exclude: |
             api/versions/**
 
-      - name: Stop Gradle daemons
-        run: ./gradlew --stop
-
   github-release:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true)
 
     needs: publish
 
