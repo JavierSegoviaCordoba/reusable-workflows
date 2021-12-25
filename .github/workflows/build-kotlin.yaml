@@ -148,9 +148,9 @@ jobs:
           folder: 'build/reports/allTests/'
           clean: true
           single-commit: true
-          target-folder: 'reports/all-tests'
+          target-folder: 'reports-generated/all-tests'
           clean-exclude: |
-            !reports/all-tests/**
+            !reports-generated/all-tests/**
 
   api-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.api-check == true)
@@ -258,9 +258,9 @@ jobs:
           folder: 'build/reports/detekt/'
           clean: true
           single-commit: true
-          target-folder: 'reports/code-analysis'
+          target-folder: 'reports-generated/code-analysis'
           clean-exclude: |
-            !reports/code-analysis/**
+            !reports-generated/code-analysis/**
 
   code-format-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-format-check == true)
@@ -324,9 +324,9 @@ jobs:
           folder: ${{ runner.temp }}/qodana/results/report
           clean: true
           single-commit: true
-          target-folder: reports/code-quality
+          target-folder: 'reports-generated/code-quality'
           clean-exclude: |
-            !reports/code-quality/**
+            !reports-generated/code-quality/**
 
   publish-snapshot:
     if: |
@@ -407,4 +407,4 @@ jobs:
           clean: true
           clean-exclude: |
             api/versions/**
-            reports
+            reports-generated/**
