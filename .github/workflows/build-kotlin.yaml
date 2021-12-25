@@ -133,12 +133,24 @@ jobs:
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
 
-      - name: Upload reports
+      - name: Upload all tests report
         if: failure()
         uses: actions/upload-artifact@v2.3.1
         with:
-          name: 'reports-${{ matrix.os }}'
-          path: '**/build/reports/**'
+          name: 'report-all-tests-${{ matrix.os }}'
+          path: 'build/reports/allTests'
+
+      - name: Deploy all tests to GitHub Pages
+        if: runner.os == 'Linux'
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: 'build/reports/allTests/'
+          clean: true
+          single-commit: true
+          target-folder: 'reports/all-tests'
+          clean-exclude: |
+            !reports/all-tests/**
 
   api-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.api-check == true)
@@ -225,10 +237,30 @@ jobs:
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
 
-      - name: Upload code analysis reports
+      - name: Upload Code Scanning code analysis report
         uses: github/codeql-action/upload-sarif@v1
         with:
           sarif_file: 'build/reports/detekt/detekt.sarif'
+
+      - name: Upload code analysis report
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'report-code-analysis'
+          path: 'build/reports/detekt/detekt.html'
+
+      - name: Rename code analysis report to index.html
+        run: mv build/reports/detekt/detekt.html build/reports/detekt/index.html
+
+      - name: Deploy code analysis to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: 'build/reports/detekt/'
+          clean: true
+          single-commit: true
+          target-folder: 'reports/code-analysis'
+          clean-exclude: |
+            !reports/code-analysis/**
 
   code-format-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-format-check == true)
@@ -279,14 +311,22 @@ jobs:
         with:
           linter: jetbrains/qodana-jvm-android
 
+      - name: Upload code quality report
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'report-code-quality'
+          path: ${{ runner.temp }}/qodana/results/report
+
       - name: Deploy code quality to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
           branch: 'gh-pages'
           folder: ${{ runner.temp }}/qodana/results/report
-          clean: false
+          clean: true
           single-commit: true
           target-folder: reports/code-quality
+          clean-exclude: |
+            !reports/code-quality/**
 
   publish-snapshot:
     if: |
