@@ -152,6 +152,18 @@ jobs:
           clean-exclude: |
             !reports-generated/all-tests/**
 
+      - name: Deploy code coverage to GitHub Pages
+        if: runner.os == 'Linux'
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: 'build/reports/kover/html/'
+          clean: true
+          single-commit: true
+          target-folder: 'reports-generated/code-coverage'
+          clean-exclude: |
+            !reports-generated/code-coverage/**
+
   api-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.api-check == true)
 
