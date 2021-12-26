@@ -68,6 +68,11 @@ on:
         default: ''
         required: false
         type: string
+      gradle-args-update-sonarqube:
+        description: 'Gradle args for `Update SonarQube` step'
+        default: ''
+        required: false
+        type: string
       gradle-args-publish-snapshot:
         description: 'Gradle args for `Publish snapshot` step'
         default: ''
@@ -75,6 +80,11 @@ on:
         type: string
       allow-github-actor-bots:
         description: 'Jobs are executed if the GitHub Actor contains `[bot]` (for examples: `dependabot[bot]` and `renovate[`bot`])'
+        default: true
+        required: false
+        type: boolean
+      update-sonarqube:
+        description: 'Update the latest analysis to SonarQube'
         default: true
         required: false
         type: boolean
@@ -139,6 +149,12 @@ jobs:
         with:
           name: 'report-all-tests-${{ matrix.os }}'
           path: 'build/reports/allTests'
+
+      - name: Upload code coverage report
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'report-code-coverage-${{ matrix.os }}'
+          path: 'build/reports/kover'
 
       - name: Deploy all tests to GitHub Pages
         if: runner.os == 'Linux'
@@ -339,6 +355,50 @@ jobs:
           target-folder: 'reports-generated/code-quality'
           clean-exclude: |
             !reports-generated/code-quality/**
+
+  update-sonarqube:
+    if: |
+      !cancelled() && !failure() &&
+      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.update-sonarqube == true))
+
+    needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
+
+    runs-on: 'ubuntu-latest'
+
+    env:
+      SONAR_TOKEN: '${{ secrets.SONAR_TOKEN }}'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Download code analysis reports
+        uses: actions/download-artifact@v2
+        with:
+          name: 'report-code-analysis'
+
+      - name: Download code coverage reports
+        uses: actions/download-artifact@v2
+        with:
+          name: 'report-code-coverage-ubuntu-latest'
+
+      - name: Update SonarQube
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: |
+            sonarqube
+            ${{ inputs.gradle-args-update-sonarqube }}
+            ${{ inputs.gradle-args }}
+            -Psemver.stage=snapshot
 
   publish-snapshot:
     if: |
