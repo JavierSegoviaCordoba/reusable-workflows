@@ -148,6 +148,7 @@ jobs:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
             allTests
+            koverReport
             ${{ inputs.gradle-args-all-tests }}
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
