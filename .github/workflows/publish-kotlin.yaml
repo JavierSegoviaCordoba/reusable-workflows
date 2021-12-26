@@ -38,6 +38,16 @@ on:
         default: ''
         required: false
         type: string
+      gradle-args-publish-update-sonarqube:
+        description: 'Gradle args for `Update SonarQube` step'
+        default: ''
+        required: false
+        type: string
+      deploy-reports:
+        description: 'Deploy reports to GitHub Pages and SonarQube'
+        default: true
+        required: false
+        type: boolean
       publish-github-release:
         description: 'Publish GitHub release'
         default: true
@@ -49,8 +59,6 @@ on:
         required: false
         type: boolean
     secrets:
-      TOKEN_GITHUB_ACTION:
-        required: false
       OSS_USER:
         required: false
       OSS_TOKEN:
@@ -77,6 +85,11 @@ on:
         required: false
       JETBRAINS_MARKETPLACE_TOKEN:
         required: false
+      SONAR_TOKEN:
+        required: false
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   build:
@@ -116,21 +129,56 @@ jobs:
           arguments: build
 
       - name: Upload reports
-        if: failure()
         uses: actions/upload-artifact@v2.3.1
         with:
           name: 'reports-${{ matrix.os }}'
-          path: '**/build/reports/**'
+          path: 'build/reports'
+
+  code-quality-check:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Restore Kotlin native cache
+        uses: actions/cache@v2.1.7
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Code quality
+        uses: JetBrains/qodana-action@v4.1.1
+        with:
+          linter: jetbrains/qodana-jvm-android
+
+      - name: Upload code quality report
+        uses: actions/upload-artifact@v2.3.1
+        with:
+          name: 'report-code-quality'
+          path: ${{ runner.temp }}/qodana/results/report
 
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
-    needs: build
+    needs: [ build, code-quality-check ]
 
     runs-on: 'macos-latest'
 
     env:
-      TOKEN_GITHUB_ACTION: '${{ secrets.TOKEN_GITHUB_ACTION }}'
       OSS_USER: '${{ secrets.OSS_USER }}'
       OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
       OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
@@ -204,6 +252,78 @@ jobs:
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
 
+  deploy-reports:
+    if: |
+      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-reports == true))
+
+    needs: [ build, code-quality-check ]
+
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v2.4.0
+        with:
+          fetch-depth: 0
+
+      - name: Restore Kotlin native cache
+        uses: actions/cache@v2.1.7
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
+      - name: Set up Java
+        uses: actions/setup-java@v2.5.0
+        with:
+          distribution: 'zulu'
+          java-version: 11
+
+      - name: Download reports
+        uses: actions/download-artifact@v2
+        with:
+          name: 'reports-ubuntu-latest'
+          path: 'build/reports'
+
+      - name: Update SonarQube
+        uses: gradle/gradle-build-action@v2.0.1
+        with:
+          cache-disabled: '${{ !inputs.gradle-cache }}'
+          arguments: |
+            sonarqube
+            ${{ inputs.gradle-args-update-sonarqube }}
+            ${{ inputs.gradle-args }}
+            -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
+
+      - name: Rename and move reports
+        run: |
+          ls -R build/
+          mkdir -p build/reports-generated/all-tests
+          mv build/reports/allTests/* build/reports-generated/all-tests
+          mkdir -p build/reports-generated/code-analysis
+          mv build/reports/detekt/detekt.html build/reports-generated/code-analysis/index.html
+          mkdir -p build/reports-generated/code-coverage
+          mv build/reports/kover/html/* build/reports-generated/code-coverage
+
+      - name: Download code quality reports
+        uses: actions/download-artifact@v2
+        with:
+          name: 'report-code-quality'
+          path: 'build/reports-generated/code-quality'
+
+      - name: Deploy reports to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: 'build/reports-generated/'
+          clean: true
+          single-commit: true
+          target-folder: 'reports-generated/'
+          clean-exclude: |
+            !reports-generated/**
+
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
 
@@ -265,7 +385,7 @@ jobs:
       - name: Publish GitHub Release
         uses: anton-yurchenko/git-release@v4.2.0
         env:
-          GITHUB_TOKEN: '${{ secrets.TOKEN_GITHUB_ACTION }}'
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           DRAFT_RELEASE: false
           PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
           CHANGELOG_FILE: 'CHANGELOG.md'

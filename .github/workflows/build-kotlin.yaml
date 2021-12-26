@@ -83,8 +83,8 @@ on:
         default: true
         required: false
         type: boolean
-      update-sonarqube:
-        description: 'Update the latest analysis to SonarQube'
+      deploy-reports:
+        description: 'Deploy reports to GitHub Pages and SonarQube'
         default: true
         required: false
         type: boolean
@@ -110,6 +110,11 @@ on:
         required: false
       OSS_STAGING_PROFILE_ID:
         required: false
+      SONAR_TOKEN:
+        required: false
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 jobs:
   all-tests:
@@ -154,7 +159,6 @@ jobs:
             -Psemver.stage=snapshot
 
       - name: Upload all tests report
-        if: failure()
         uses: actions/upload-artifact@v2.3.1
         with:
           name: 'report-all-tests-${{ matrix.os }}'
@@ -165,30 +169,6 @@ jobs:
         with:
           name: 'report-code-coverage-${{ matrix.os }}'
           path: 'build/reports/kover'
-
-      - name: Deploy all tests to GitHub Pages
-        if: runner.os == 'Linux'
-        uses: JamesIves/github-pages-deploy-action@4.1.8
-        with:
-          branch: 'gh-pages'
-          folder: 'build/reports/allTests/'
-          clean: true
-          single-commit: true
-          target-folder: 'reports-generated/all-tests'
-          clean-exclude: |
-            !reports-generated/all-tests/**
-
-      - name: Deploy code coverage to GitHub Pages
-        if: runner.os == 'Linux'
-        uses: JamesIves/github-pages-deploy-action@4.1.8
-        with:
-          branch: 'gh-pages'
-          folder: 'build/reports/kover/html/'
-          clean: true
-          single-commit: true
-          target-folder: 'reports-generated/code-coverage'
-          clean-exclude: |
-            !reports-generated/code-coverage/**
 
   api-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.api-check == true)
@@ -311,21 +291,7 @@ jobs:
         uses: actions/upload-artifact@v2.3.1
         with:
           name: 'report-code-analysis'
-          path: 'build/reports/detekt/detekt.html'
-
-      - name: Rename code analysis report to index.html
-        run: mv build/reports/detekt/detekt.html build/reports/detekt/index.html
-
-      - name: Deploy code analysis to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.8
-        with:
-          branch: 'gh-pages'
-          folder: 'build/reports/detekt/'
-          clean: true
-          single-commit: true
-          target-folder: 'reports-generated/code-analysis'
-          clean-exclude: |
-            !reports-generated/code-analysis/**
+          path: 'build/reports/detekt'
 
   code-format-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-format-check == true)
@@ -400,28 +366,13 @@ jobs:
           name: 'report-code-quality'
           path: ${{ runner.temp }}/qodana/results/report
 
-      - name: Deploy code quality to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@4.1.8
-        with:
-          branch: 'gh-pages'
-          folder: ${{ runner.temp }}/qodana/results/report
-          clean: true
-          single-commit: true
-          target-folder: 'reports-generated/code-quality'
-          clean-exclude: |
-            !reports-generated/code-quality/**
-
-  update-sonarqube:
+  deploy-reports:
     if: |
-      !cancelled() && !failure() &&
-      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.update-sonarqube == true))
+      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-reports == true))
 
     needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
 
     runs-on: 'ubuntu-latest'
-
-    env:
-      SONAR_TOKEN: '${{ secrets.SONAR_TOKEN }}'
 
     steps:
       - name: Checkout
@@ -444,15 +395,41 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: Download all tests reports
+        uses: actions/download-artifact@v2
+        with:
+          name: 'report-all-tests-ubuntu-latest'
+          path: 'build/reports-generated/all-tests'
+
       - name: Download code analysis reports
         uses: actions/download-artifact@v2
         with:
           name: 'report-code-analysis'
+          path: 'build/reports-generated/code-analysis/'
+
+      - name: Rename code analysis report
+        run: |
+          mkdir -p build/reports/detekt
+          cp build/reports-generated/code-analysis/detekt.xml build/reports/detekt/detekt.xml
+          mv build/reports-generated/code-analysis/detekt.html build/reports-generated/code-analysis/index.html
 
       - name: Download code coverage reports
         uses: actions/download-artifact@v2
         with:
           name: 'report-code-coverage-ubuntu-latest'
+          path: '${{ runner.temp }}/reports/code-coverage'
+
+      - name: Rename code coverage report
+        run: |
+          mv ${{ runner.temp }}/reports/code-coverage/html build/reports-generated/code-coverage
+          mkdir -p build/reports/kover
+          mv ${{ runner.temp }}/reports/code-coverage/report.xml build/reports/kover/report.xml
+
+      - name: Download code quality reports
+        uses: actions/download-artifact@v2
+        with:
+          name: 'report-code-quality'
+          path: 'build/reports-generated/code-quality'
 
       - name: Update SonarQube
         uses: gradle/gradle-build-action@v2.0.1
@@ -463,6 +440,18 @@ jobs:
             ${{ inputs.gradle-args-update-sonarqube }}
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
+            -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
+
+      - name: Deploy reports to GitHub Pages
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: 'build/reports-generated/'
+          clean: true
+          single-commit: true
+          target-folder: 'reports-generated/'
+          clean-exclude: |
+            !reports-generated/**
 
   publish-snapshot:
     if: |
