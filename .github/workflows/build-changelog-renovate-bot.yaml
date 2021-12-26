@@ -25,6 +25,15 @@ jobs:
           fetch-depth: 0
           token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
+      - name: Restore Kotlin native cache
+        uses: actions/cache@v2.1.7
+        with:
+          path: |
+            ~/.konan
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
+
       - name: Set up Java
         uses: actions/setup-java@v2.5.0
         with:
