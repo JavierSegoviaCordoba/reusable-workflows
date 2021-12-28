@@ -3,6 +3,16 @@ name: build-kotlin
 on:
   workflow_call:
     inputs:
+      allow-github-actor-bots:
+        description: 'Jobs are executed if the GitHub Actor contains `[bot]` (for examples: `dependabot[bot]` and `renovate[`bot`])'
+        default: true
+        required: false
+        type: boolean
+      gradle-cache:
+        description: 'Use Gradle cache'
+        default: true
+        required: false
+        type: boolean
       gradle-args:
         description: 'Gradle args for every steps'
         default: ''
@@ -68,18 +78,13 @@ on:
         default: ''
         required: false
         type: string
-      gradle-args-update-sonarqube:
-        description: 'Gradle args for `Update SonarQube` step'
-        default: ''
-        required: false
-        type: string
       gradle-args-publish-snapshot:
         description: 'Gradle args for `Publish snapshot` step'
         default: ''
         required: false
         type: string
-      allow-github-actor-bots:
-        description: 'Jobs are executed if the GitHub Actor contains `[bot]` (for examples: `dependabot[bot]` and `renovate[`bot`])'
+      publish-snapshot:
+        description: 'Publish artifacts to Sonatype snapshots repository'
         default: true
         required: false
         type: boolean
@@ -88,18 +93,13 @@ on:
         default: true
         required: false
         type: boolean
-      publish-snapshot:
-        description: 'Publish artifacts to Sonatype snapshots repository'
-        default: true
+      gradle-args-update-sonarqube:
+        description: 'Gradle args for `Update SonarQube` step'
+        default: ''
         required: false
-        type: boolean
+        type: string
       publish-docs:
         description: 'Publish docs to GitHub pages'
-        default: true
-        required: false
-        type: boolean
-      gradle-cache:
-        description: 'Use Gradle cache'
         default: true
         required: false
         type: boolean
