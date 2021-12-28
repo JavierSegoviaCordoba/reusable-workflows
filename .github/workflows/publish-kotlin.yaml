@@ -3,6 +3,11 @@ name: publish-kotlin
 on:
   workflow_call:
     inputs:
+      code-quality-check:
+        description: 'Enable code quality'
+        default: true
+        required: false
+        type: boolean
       publish-maven-central:
         description: 'Publish artifacts to MavenCentral'
         default: true
@@ -135,7 +140,7 @@ jobs:
           path: 'build/reports'
 
   code-quality-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
 
     runs-on: ubuntu-latest
 
