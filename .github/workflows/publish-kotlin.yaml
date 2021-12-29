@@ -3,6 +3,11 @@ name: publish-kotlin
 on:
   workflow_call:
     inputs:
+      code-coverage-report:
+        description: 'Enable code coverage report'
+        default: true
+        required: false
+        type: boolean
       code-quality-check:
         description: 'Enable code quality'
         default: true
@@ -302,13 +307,20 @@ jobs:
             ${{ inputs.gradle-args }}
             -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
 
-      - name: Rename and move reports
+      - name: Move all tests reports
         run: |
-          ls -R build/
           mkdir -p build/reports-generated/all-tests
           mv build/reports/allTests/* build/reports-generated/all-tests
+
+      - name: Move code analysis reports
+        run: |
           mkdir -p build/reports-generated/code-analysis
           mv build/reports/detekt/detekt.html build/reports-generated/code-analysis/index.html
+
+
+      - name: Move code coverage reports
+        if: (inputs.code-coverage-report == true)
+        run: |
           mkdir -p build/reports-generated/code-coverage
           mv build/reports/kover/html/* build/reports-generated/code-coverage
 
