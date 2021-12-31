@@ -307,6 +307,9 @@ jobs:
             ${{ inputs.gradle-args }}
             -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
 
+      - name: Set version to an environment variable
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+
       - name: Move all tests reports
         run: |
           mkdir -p build/reports-generated/all-tests
@@ -316,7 +319,6 @@ jobs:
         run: |
           mkdir -p build/reports-generated/code-analysis
           mv build/reports/detekt/detekt.html build/reports-generated/code-analysis/index.html
-
 
       - name: Move code coverage reports
         if: (inputs.code-coverage-report == true)
@@ -336,7 +338,8 @@ jobs:
           branch: 'gh-pages'
           folder: 'build/reports-generated/'
           clean: true
-          single-commit: true
+          single-commit: false
+          commit-message: 'Deploy ${{ env.lib_version }} reports'
           target-folder: 'reports-generated/'
           clean-exclude: |
             !reports-generated/**
@@ -383,6 +386,7 @@ jobs:
           single-commit: true
           clean: true
           clean-exclude: |
+            api/snapshot/**
             api/versions/**
             reports-generated/**
 

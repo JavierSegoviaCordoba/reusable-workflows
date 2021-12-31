@@ -103,11 +103,16 @@ on:
         default: ''
         required: false
         type: string
-      publish-docs:
-        description: 'Publish docs to GitHub pages'
+      deploy-docs:
+        description: 'Deploy docs to GitHub pages'
         default: true
         required: false
         type: boolean
+      publish-all-docs:
+        description: 'Publish all docs to GitHub pages'
+        default: false
+        required: false
+        type: string
     secrets:
       OSS_USER:
         required: false
@@ -449,13 +454,17 @@ jobs:
             -Psemver.stage=snapshot
             -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
 
+      - name: Set version to an environment variable
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+
       - name: Deploy reports to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
           branch: 'gh-pages'
           folder: 'build/reports-generated/'
           clean: true
-          single-commit: true
+          single-commit: false
+          commit-message: 'Deploy ${{ env.lib_version }} reports'
           target-folder: 'reports-generated/'
           clean-exclude: |
             !reports-generated/**
@@ -506,7 +515,7 @@ jobs:
             -Psemver.stage=snapshot
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-docs == true)
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true)
 
     needs: publish-snapshot
 
@@ -548,13 +557,31 @@ jobs:
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
 
-      - name: Deploy docs to GitHub Pages
+      - name: Set version to an environment variable
+        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+
+      - name: Deploy all docs to GitHub Pages
+        if: (inputs.publish-all-docs == 'true')
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
-          single-commit: true
+          single-commit: false
+          commit-message: 'Deploy ${{ env.lib_version }} all docs'
           clean: true
           clean-exclude: |
             api/versions/**
             reports-generated/**
+
+      - name: Deploy only API docs and reports to GitHub Pages
+        if: (inputs.publish-all-docs == 'false')
+        uses: JamesIves/github-pages-deploy-action@4.1.8
+        with:
+          branch: 'gh-pages'
+          folder: 'build/docs/_site/api/snapshot/'
+          target-folder: 'api/snapshot/'
+          single-commit: false
+          commit-message: 'Deploy ${{ env.lib_version }} API docs and reports'
+          clean: true
+          clean-exclude: |
+            !api/snapshot/**
