@@ -51,7 +51,7 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
@@ -70,7 +70,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Patch Changelog and regenerate README badges
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
@@ -89,7 +89,7 @@ jobs:
           git commit -m "Publish ${{ env.lib_version }}" -a
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.0.1
+        uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: '${{ !inputs.gradle-cache }}'
           arguments: |
