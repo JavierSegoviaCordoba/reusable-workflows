@@ -165,7 +165,6 @@ jobs:
             allTests
             ${{ inputs.gradle-args-all-tests }}
             ${{ inputs.gradle-args }}
-            -Psemver.stage=snapshot
 
       - name: Upload all tests report
         uses: actions/upload-artifact@v2.3.1
@@ -214,7 +213,6 @@ jobs:
             apiCheck
             ${{ inputs.gradle-args-api-check }}
             ${{ inputs.gradle-args }}
-            -Psemver.stage=snapshot
 
   assemble:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.assemble == true)
@@ -254,7 +252,6 @@ jobs:
             assemble
             ${{ inputs.gradle-args-assemble }}
             ${{ inputs.gradle-args }}
-            -Psemver.stage=snapshot
 
   code-analysis-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-analysis-check == true)
@@ -290,7 +287,6 @@ jobs:
             detekt
             ${{ inputs.gradle-args-code-analysis-check }}
             ${{ inputs.gradle-args }}
-            -Psemver.stage=snapshot
 
       - name: Upload Code Scanning code analysis report
         uses: github/codeql-action/upload-sarif@v1
@@ -337,7 +333,6 @@ jobs:
             spotlessCheck
             ${{ inputs.gradle-args-code-format-check }}
             ${{ inputs.gradle-args }}
-            -Psemver.stage=snapshot
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
@@ -378,7 +373,7 @@ jobs:
 
   deploy-reports:
     if: |
-      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-reports == true))
+      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.deploy-reports == true))
 
     needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
 
@@ -451,13 +446,14 @@ jobs:
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
             ${{ inputs.gradle-args }}
-            -Psemver.stage=snapshot
             -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
 
       - name: Set version to an environment variable
+        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
         run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
 
       - name: Deploy reports to GitHub Pages
+        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
         uses: JamesIves/github-pages-deploy-action@4.1.8
         with:
           branch: 'gh-pages'
