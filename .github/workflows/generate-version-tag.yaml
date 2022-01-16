@@ -58,6 +58,8 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             build
             -Psemver.stage=${{ inputs.stage }}
@@ -77,6 +79,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             patchChangelog
             mergeChangelog

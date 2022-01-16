@@ -140,6 +140,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: build
 
       - name: Upload reports
@@ -240,6 +241,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishToSonatype
             closeAndReleaseSonatypeStagingRepository
@@ -250,6 +252,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishPlugins
             --no-parallel
@@ -262,6 +265,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
@@ -305,6 +309,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
@@ -380,6 +385,7 @@ jobs:
         uses: gradle/gradle-build-action@v2.1.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: buildDocs
 
       - name: Deploy docs to GitHub Pages
