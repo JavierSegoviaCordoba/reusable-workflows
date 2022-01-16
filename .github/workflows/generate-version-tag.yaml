@@ -21,7 +21,7 @@ on:
         description: 'Use Gradle cache'
         default: true
         required: false
-        type: boolean
+        type: string
     secrets:
       TOKEN_GITHUB_ACTION:
         required: true
@@ -57,7 +57,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             build
             -Psemver.stage=${{ inputs.stage }}
@@ -76,7 +76,7 @@ jobs:
       - name: Patch Changelog and regenerate README badges
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             patchChangelog
             mergeChangelog

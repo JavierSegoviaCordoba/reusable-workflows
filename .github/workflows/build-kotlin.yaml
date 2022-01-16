@@ -16,7 +16,7 @@ on:
         description: 'Use Gradle cache'
         default: true
         required: false
-        type: boolean
+        type: string
       gradle-args:
         description: 'Gradle args for every steps'
         default: ''
@@ -164,7 +164,7 @@ jobs:
       - name: All tests
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             allTests
             ${{ inputs.gradle-args-all-tests }}
@@ -212,7 +212,7 @@ jobs:
       - name: Check API
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             apiCheck
             ${{ inputs.gradle-args-api-check }}
@@ -251,7 +251,7 @@ jobs:
       - name: Assemble
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             assemble
             ${{ inputs.gradle-args-assemble }}
@@ -286,7 +286,7 @@ jobs:
       - name: Code analysis
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             detekt
             ${{ inputs.gradle-args-code-analysis-check }}
@@ -332,7 +332,7 @@ jobs:
       - name: Code format
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             spotlessCheck
             ${{ inputs.gradle-args-code-format-check }}
@@ -445,7 +445,7 @@ jobs:
       - name: Update SonarQube
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
@@ -507,7 +507,7 @@ jobs:
       - name: Publish snapshot
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             publishToSonatype
             ${{ inputs.gradle-args-publish-snapshot }}
@@ -550,7 +550,7 @@ jobs:
       - name: Generate docs
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             buildDocs
             ${{ inputs.gradle-args-build-docs }}

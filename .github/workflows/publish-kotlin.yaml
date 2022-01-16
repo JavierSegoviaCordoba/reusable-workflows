@@ -71,7 +71,7 @@ on:
         description: 'Use Gradle cache'
         default: true
         required: false
-        type: boolean
+        type: string
     secrets:
       OSS_USER:
         required: false
@@ -139,7 +139,7 @@ jobs:
       - name: Build
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: build
 
       - name: Upload reports
@@ -239,7 +239,7 @@ jobs:
         if: (inputs.publish-maven-central == true)
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             publishToSonatype
             closeAndReleaseSonatypeStagingRepository
@@ -249,7 +249,7 @@ jobs:
         if: (inputs.publish-gradle-plugin-portal == true)
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             publishPlugins
             --no-parallel
@@ -261,7 +261,7 @@ jobs:
         if: (inputs.publish-jetbrains-marketplace == true)
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
@@ -304,7 +304,7 @@ jobs:
       - name: Update SonarQube
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
@@ -379,7 +379,7 @@ jobs:
       - name: Generate Site docs
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: buildDocs
 
       - name: Deploy docs to GitHub Pages

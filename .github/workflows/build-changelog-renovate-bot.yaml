@@ -7,7 +7,7 @@ on:
         description: 'Use Gradle cache'
         default: true
         required: false
-        type: boolean
+        type: string
     secrets:
       TOKEN_GITHUB_ACTION:
         required: true
@@ -43,7 +43,7 @@ jobs:
       - name: Add updated dependencies to the CHANGELOG from Renovate
         uses: gradle/gradle-build-action@v2.1.0
         with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: addChangelogItem --renovateCommitTable
 
       - name: Commit and push
