@@ -370,7 +370,7 @@ jobs:
           java-version: 11
 
       - name: Code quality
-        uses: JetBrains/qodana-action@v4.2.4
+        uses: JetBrains/qodana-action@v4.2.5
         with:
           linter: jetbrains/qodana-jvm-android
 
