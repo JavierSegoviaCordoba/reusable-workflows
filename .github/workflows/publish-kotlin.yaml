@@ -342,7 +342,7 @@ jobs:
           path: 'build/reports-generated/code-quality'
 
       - name: Deploy reports to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: 'gh-pages'
           folder: 'build/reports-generated/'
@@ -389,7 +389,7 @@ jobs:
           arguments: buildDocs
 
       - name: Deploy docs to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.2.3
+        uses: JamesIves/github-pages-deploy-action@v4.2.5
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
