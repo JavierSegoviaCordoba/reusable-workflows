@@ -414,7 +414,7 @@ jobs:
           fetch-depth: 0
 
       - name: Publish GitHub Release
-        uses: anton-yurchenko/git-release@v4.2.2
+        uses: anton-yurchenko/git-release@v4.2.3
         env:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           DRAFT_RELEASE: false
