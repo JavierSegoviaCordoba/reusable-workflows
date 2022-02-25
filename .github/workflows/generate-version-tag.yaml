@@ -59,7 +59,6 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             build
             -Psemver.stage=${{ inputs.stage }}
