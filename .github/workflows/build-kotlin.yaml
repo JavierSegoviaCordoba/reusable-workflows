@@ -410,13 +410,13 @@ jobs:
           java-version: 11
 
       - name: Download all tests reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'report-all-tests-ubuntu-latest'
           path: 'build/reports-generated/all-tests'
 
       - name: Download code analysis reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'report-code-analysis'
           path: 'build/reports-generated/code-analysis/'
@@ -429,7 +429,7 @@ jobs:
 
       - name: Download code coverage reports
         if: (inputs.code-coverage-report == true)
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'report-code-coverage-ubuntu-latest'
           path: '${{ runner.temp }}/reports/code-coverage'
@@ -442,7 +442,7 @@ jobs:
           mv ${{ runner.temp }}/reports/code-coverage/report.xml build/reports/kover/report.xml
 
       - name: Download code quality reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'report-code-quality'
           path: 'build/reports-generated/code-quality'
