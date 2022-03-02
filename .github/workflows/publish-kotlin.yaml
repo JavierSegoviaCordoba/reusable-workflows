@@ -300,7 +300,7 @@ jobs:
           java-version: 11
 
       - name: Download reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'reports-ubuntu-latest'
           path: 'build/reports'
@@ -336,7 +336,7 @@ jobs:
           mv build/reports/kover/html/* build/reports-generated/code-coverage
 
       - name: Download code quality reports
-        uses: actions/download-artifact@v2
+        uses: actions/download-artifact@v3
         with:
           name: 'report-code-quality'
           path: 'build/reports-generated/code-quality'
