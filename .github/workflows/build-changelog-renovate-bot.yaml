@@ -41,7 +41,7 @@ jobs:
           java-version: 11
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
-        uses: gradle/gradle-build-action@v2.1.4
+        uses: gradle/gradle-build-action@v2.1.5
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
