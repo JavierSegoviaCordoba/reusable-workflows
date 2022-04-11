@@ -122,7 +122,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.2
         with:
           path: |
             ~/.konan
@@ -161,7 +161,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.2
         with:
           path: |
             ~/.konan
@@ -213,7 +213,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.2
         with:
           path: |
             ~/.konan
@@ -283,7 +283,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.2
         with:
           path: |
             ~/.konan
@@ -365,7 +365,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.0.1
+        uses: actions/cache@v3.0.2
         with:
           path: |
             ~/.konan
