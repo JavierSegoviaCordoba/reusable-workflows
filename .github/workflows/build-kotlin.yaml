@@ -462,7 +462,7 @@ jobs:
 
       - name: Deploy reports to GitHub Pages
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
-        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        uses: JamesIves/github-pages-deploy-action@v4.3.2
         with:
           branch: 'gh-pages'
           folder: 'build/reports-generated/'
@@ -568,7 +568,7 @@ jobs:
 
       - name: Deploy all docs to GitHub Pages
         if: (inputs.publish-all-docs == 'true')
-        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        uses: JamesIves/github-pages-deploy-action@v4.3.2
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
@@ -581,7 +581,7 @@ jobs:
 
       - name: Deploy only API docs and reports to GitHub Pages
         if: (inputs.publish-all-docs == 'false')
-        uses: JamesIves/github-pages-deploy-action@v4.3.0
+        uses: JamesIves/github-pages-deploy-action@v4.3.2
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site/api/snapshot/'
