@@ -37,6 +37,11 @@ on:
         default: true
         required: false
         type: boolean
+      gradle-args-build:
+        description: 'Gradle args for `build` step'
+        default: ''
+        required: false
+        type: string
       gradle-args-publish-maven-central:
         description: 'Gradle args for `Publish to MavenCentral` step'
         default: ''
@@ -141,7 +146,9 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           cache-read-only: ${{ github.ref != 'refs/heads/main' }}
-          arguments: build
+          arguments: | 
+            build
+            ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.0.0
