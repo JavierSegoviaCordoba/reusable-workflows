@@ -370,7 +370,7 @@ jobs:
           java-version: 11
 
       - name: Code quality
-        uses: JetBrains/qodana-action@v5.0.4
+        uses: JetBrains/qodana-action@v5.1.0
 
       - name: Upload code quality report
         uses: actions/upload-artifact@v3.0.0
