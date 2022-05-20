@@ -172,14 +172,14 @@ jobs:
             ${{ inputs.gradle-args }}
 
       - name: Upload all tests report
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: 'report-all-tests-${{ matrix.os }}'
           path: 'build/reports/allTests'
 
       - name: Upload code coverage report
         if: (inputs.code-coverage-report == true)
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: 'report-code-coverage-${{ matrix.os }}'
           path: 'build/reports/kover'
@@ -302,7 +302,7 @@ jobs:
           sarif_file: 'build/reports/detekt/detekt.sarif'
 
       - name: Upload code analysis report
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: 'report-code-analysis'
           path: 'build/reports/detekt'
@@ -373,7 +373,7 @@ jobs:
         uses: JetBrains/qodana-action@v5.1.0
 
       - name: Upload code quality report
-        uses: actions/upload-artifact@v3.0.0
+        uses: actions/upload-artifact@v3.1.0
         with:
           name: 'report-code-quality'
           path: ${{ runner.temp }}/qodana/results/report
