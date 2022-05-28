@@ -158,7 +158,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: All tests
@@ -207,7 +207,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Check API
@@ -247,7 +247,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Assemble
@@ -283,7 +283,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Code analysis
@@ -330,7 +330,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Code format
@@ -366,7 +366,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Code quality
@@ -404,7 +404,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Download all tests reports
@@ -505,7 +505,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Publish snapshot
@@ -549,7 +549,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.3.0
         with:
-          distribution: 'zulu'
+          distribution: 'temurin'
           java-version: 11
 
       - name: Generate docs
