@@ -142,10 +142,9 @@ jobs:
           java-version: 11
 
       - name: Build
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: | 
             build
             ${{ inputs.gradle-args-publish-maven-central }}
@@ -243,10 +242,9 @@ jobs:
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishToSonatype
             closeAndReleaseSonatypeStagingRepository
@@ -254,10 +252,9 @@ jobs:
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishPlugins
             --no-parallel
@@ -267,10 +264,9 @@ jobs:
 
       - name: Publish to JetBrains marketplace
         if: (inputs.publish-jetbrains-marketplace == true)
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishPlugin
             ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
@@ -311,10 +307,9 @@ jobs:
           path: 'build/reports'
 
       - name: Update SonarQube
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
@@ -387,10 +382,9 @@ jobs:
           java-version: 11
 
       - name: Generate Site docs
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: buildDocs
 
       - name: Deploy docs to GitHub Pages

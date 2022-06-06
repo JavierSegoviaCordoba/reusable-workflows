@@ -162,10 +162,9 @@ jobs:
           java-version: 11
 
       - name: All tests
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             allTests
             ${{ inputs.gradle-args-all-tests }}
@@ -211,10 +210,9 @@ jobs:
           java-version: 11
 
       - name: Check API
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             apiCheck
             ${{ inputs.gradle-args-api-check }}
@@ -251,10 +249,9 @@ jobs:
           java-version: 11
 
       - name: Assemble
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             assemble
             ${{ inputs.gradle-args-assemble }}
@@ -287,10 +284,9 @@ jobs:
           java-version: 11
 
       - name: Code analysis
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             detekt
             ${{ inputs.gradle-args-code-analysis-check }}
@@ -334,10 +330,9 @@ jobs:
           java-version: 11
 
       - name: Code format
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             spotlessCheck
             ${{ inputs.gradle-args-code-format-check }}
@@ -446,10 +441,9 @@ jobs:
           path: 'build/reports-generated/code-quality'
 
       - name: Update SonarQube
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
@@ -509,10 +503,9 @@ jobs:
           java-version: 11
 
       - name: Publish snapshot
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             publishToSonatype
             ${{ inputs.gradle-args-publish-snapshot }}
@@ -553,10 +546,9 @@ jobs:
           java-version: 11
 
       - name: Generate docs
-        uses: gradle/gradle-build-action@v2.1.7
+        uses: gradle/gradle-build-action@v2.2.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          cache-read-only: ${{ github.ref != 'refs/heads/main' }}
           arguments: |
             buildDocs
             ${{ inputs.gradle-args-build-docs }}
