@@ -162,7 +162,7 @@ jobs:
           java-version: 11
 
       - name: All tests
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -210,7 +210,7 @@ jobs:
           java-version: 11
 
       - name: Check API
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -249,7 +249,7 @@ jobs:
           java-version: 11
 
       - name: Assemble
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -284,7 +284,7 @@ jobs:
           java-version: 11
 
       - name: Code analysis
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -330,7 +330,7 @@ jobs:
           java-version: 11
 
       - name: Code format
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -441,7 +441,7 @@ jobs:
           path: 'build/reports-generated/code-quality'
 
       - name: Update SonarQube
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -503,7 +503,7 @@ jobs:
           java-version: 11
 
       - name: Publish snapshot
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
@@ -546,7 +546,7 @@ jobs:
           java-version: 11
 
       - name: Generate docs
-        uses: gradle/gradle-build-action@v2.2.0
+        uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
