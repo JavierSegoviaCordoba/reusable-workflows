@@ -37,7 +37,7 @@ jobs:
       - name: Set up Java
         uses: actions/setup-java@v3.4.0
         with:
-          distribution: 'temurin'
+          distribution: 'zulu'
           java-version: 11
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
