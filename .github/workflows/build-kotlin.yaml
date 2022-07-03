@@ -118,13 +118,13 @@ on:
         required: false
         type: string
     secrets:
-      OSS_USER:
+      ANALYSIS_SONAR_LOGIN:
         required: false
-      OSS_TOKEN:
+      NEXUS_STAGING_PROFILE_ID:
         required: false
-      OSS_STAGING_PROFILE_ID:
+      NEXUS_TOKEN:
         required: false
-      SONAR_TOKEN:
+      NEXUS_USER:
         required: false
 
 env:
@@ -214,7 +214,7 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
-            apiCheck
+            checkApi
             ${{ inputs.gradle-args-api-check }}
             ${{ inputs.gradle-args }}
 
@@ -288,7 +288,7 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
-            detekt
+            checkAnalysis
             ${{ inputs.gradle-args-code-analysis-check }}
             ${{ inputs.gradle-args }}
 
@@ -334,7 +334,7 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
-            spotlessCheck
+            checkFormat
             ${{ inputs.gradle-args-code-format-check }}
             ${{ inputs.gradle-args }}
 
@@ -380,6 +380,9 @@ jobs:
     needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
 
     runs-on: 'ubuntu-latest'
+
+    env:
+      ANALYSIS_SONAR_LOGIN: '${{ secrets.ANALYSIS_SONAR_LOGIN }}'
 
     steps:
       - name: Checkout
@@ -448,7 +451,14 @@ jobs:
             sonarqube
             ${{ inputs.gradle-args-update-sonarqube }}
             ${{ inputs.gradle-args }}
-            -PcodeAnalysis.sonar.login=${{ secrets.SONAR_TOKEN }}
+
+      - name: printSemver
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          arguments: |
+            printSemver
+            --rerun-tasks
 
       - name: Set version to an environment variable
         if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
@@ -477,9 +487,9 @@ jobs:
     runs-on: 'macos-latest'
 
     env:
-      OSS_USER: '${{ secrets.OSS_USER }}'
-      OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
-      OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
+      NEXUS_USER: '${{ secrets.NEXUS_USER }}'
+      NEXUS_TOKEN: '${{ secrets.NEXUS_TOKEN }}'
+      NEXUS_STAGING_PROFILE_ID: '${{ secrets.NEXUS_STAGING_PROFILE_ID }}'
 
     steps:
       - name: Checkout
@@ -520,9 +530,9 @@ jobs:
     runs-on: 'ubuntu-latest'
 
     env:
-      OSS_USER: '${{ secrets.OSS_USER }}'
-      OSS_TOKEN: '${{ secrets.OSS_TOKEN }}'
-      OSS_STAGING_PROFILE_ID: '${{ secrets.OSS_STAGING_PROFILE_ID }}'
+      NEXUS_USER: '${{ secrets.NEXUS_USER }}'
+      NEXUS_TOKEN: '${{ secrets.NEXUS_TOKEN }}'
+      NEXUS_STAGING_PROFILE_ID: '${{ secrets.NEXUS_STAGING_PROFILE_ID }}'
 
     steps:
       - name: Checkout
@@ -550,10 +560,19 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           arguments: |
-            buildDocs
+            buildSite
             ${{ inputs.gradle-args-build-docs }}
             ${{ inputs.gradle-args }}
             -Psemver.stage=snapshot
+
+      - name: printSemver
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          arguments: |
+            printSemver
+            -Psemver.stage=snapshot
+            --rerun-tasks
 
       - name: Set version to an environment variable
         run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV

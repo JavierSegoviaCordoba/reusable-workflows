@@ -63,6 +63,16 @@ jobs:
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
 
+      - name: printSemver
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          arguments: |
+            printSemver
+            -Psemver.stage=${{ inputs.stage }}
+            -Psemver.scope=${{ inputs.scope }}
+            --rerun-tasks
+
       - name: Set version to an environment variable
         run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
 
@@ -80,7 +90,7 @@ jobs:
           arguments: |
             patchChangelog
             mergeChangelog
-            buildReadmeBadges
+            writeReadmeBadges
             -Psemver.stage=${{ inputs.stage }}
             -Psemver.scope=${{ inputs.scope }}
 
