@@ -54,27 +54,17 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+
       - name: Build
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            build
-            -Psemver.stage=${{ inputs.stage }}
-            -Psemver.scope=${{ inputs.scope }}
+        run: ./gradlew build -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
-      - name: printSemver
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            printSemver
-            -Psemver.stage=${{ inputs.stage }}
-            -Psemver.scope=${{ inputs.scope }}
-            --rerun-tasks
-
-      - name: Set version to an environment variable
-        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+      - name: Set semver as output
+        id: semver
+        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
 
       - name: Upload reports
         if: failure()
@@ -84,15 +74,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Patch Changelog and regenerate README badges
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            patchChangelog
-            mergeChangelog
-            writeReadmeBadges
-            -Psemver.stage=${{ inputs.stage }}
-            -Psemver.scope=${{ inputs.scope }}
+        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
 
       - name: Commit
         run: |
@@ -100,16 +82,10 @@ jobs:
           git config --local user.name "GitHub Action"
           git diff
           git add .
-          git commit -m "Publish ${{ env.lib_version }}" -a
+          git commit -m "Publish ${{ steps.semver.outputs.semver }}" -a
 
       - name: Generate Tag
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: '${{ !inputs.gradle-cache }}'
-          arguments: |
-            createSemverTag
-            -Psemver.stage=${{ inputs.stage }}
-            -Psemver.scope=${{ inputs.scope }}
+        run: ./gradlew createSemverTag -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Push
         run: git push --follow-tags

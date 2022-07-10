@@ -137,13 +137,13 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Build
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: | 
-            build
-            ${{ inputs.gradle-args-publish-maven-central }}
+
+      - name: Build
+        run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.0
@@ -228,36 +228,22 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Publish to MavenCentral
-        if: (inputs.publish-maven-central == true)
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            publishToSonatype
-            closeAndReleaseSonatypeStagingRepository
-            ${{ inputs.gradle-args-publish-maven-central }}
+
+      - name: Publish to MavenCentral
+        if: (inputs.publish-maven-central == true)
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            publishPlugins
-            --no-parallel
-            ${{ inputs.gradle-args-publish-gradle-plugin-portal }}
-            -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }}
-            -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: ./gradlew publishPlugins --no-parallel ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
 
       - name: Publish to JetBrains marketplace
         if: (inputs.publish-jetbrains-marketplace == true)
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            publishPlugin
-            ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
+        run: ./gradlew publishPlugin ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
 
   deploy-reports:
     if: |
@@ -291,6 +277,11 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2.2.1
+        with:
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+
       - name: Download reports
         uses: actions/download-artifact@v3
         with:
@@ -298,24 +289,11 @@ jobs:
           path: 'build/reports'
 
       - name: Update SonarQube
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            sonarqube
-            ${{ inputs.gradle-args-update-sonarqube }}
-            ${{ inputs.gradle-args }}
+        run: ./gradlew sonarqube ${{ inputs.gradle-args-update-sonarqube }} ${{ inputs.gradle-args }}
 
       - name: printSemver
-        uses: gradle/gradle-build-action@v2.2.1
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: |
-            printSemver
-            --rerun-tasks
-
-      - name: Set version to an environment variable
-        run: echo "lib_version=$(head -n 1 build/semver/version.txt)" >> $GITHUB_ENV
+        id: semver
+        run: ./gradlew printSemver --githubOnlyRoot --githubOutput
 
       - name: Move all tests reports
         run: |
@@ -346,7 +324,7 @@ jobs:
           folder: 'build/reports-generated/'
           clean: true
           single-commit: false
-          commit-message: 'Deploy ${{ env.lib_version }} reports'
+          commit-message: 'Deploy ${{ steps.semver.outputs.semver }} reports'
           target-folder: 'reports-generated/'
           clean-exclude: |
             !reports-generated/**
@@ -379,11 +357,13 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Generate Site docs
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: buildSite
+
+      - name: Generate Site docs
+        run: ./gradlew buildSite
 
       - name: Deploy docs to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.3.4

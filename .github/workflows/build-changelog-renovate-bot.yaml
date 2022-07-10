@@ -40,11 +40,13 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Add updated dependencies to the CHANGELOG from Renovate
+      - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.2.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          arguments: addChangelogItem --renovateCommitTable
+
+      - name: Add updated dependencies to the CHANGELOG from Renovate
+        run: ./gradlew addChangelogItem --renovateCommitTable
 
       - name: Commit and push
         run: |
