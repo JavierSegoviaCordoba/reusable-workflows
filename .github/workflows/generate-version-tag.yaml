@@ -30,15 +30,15 @@ on:
       TOKEN_GITHUB_ACTION:
         required: true
 
+env:
+  SIGNING_GNUPG_KEY: '${{ secrets.SIGNING_GNUPG_KEY }}'
+  SIGNING_GNUPG_PASSPHRASE: '${{ secrets.SIGNING_GNUPG_PASSPHRASE }}'
+
 jobs:
   generate-version-tag:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
     runs-on: 'macos-latest'
-
-    env:
-      SIGNING_GNUPG_KEY: '${{ secrets.SIGNING_GNUPG_KEY }}'
-      SIGNING_GNUPG_PASSPHRASE: '${{ secrets.SIGNING_GNUPG_PASSPHRASE }}'
 
     steps:
       - name: Checkout
