@@ -23,6 +23,10 @@ on:
         required: false
         type: string
     secrets:
+      SIGNING_GNUPG_KEY:
+        required: false
+      SIGNING_GNUPG_PASSPHRASE:
+        required: false
       TOKEN_GITHUB_ACTION:
         required: true
 
@@ -31,6 +35,10 @@ jobs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
     runs-on: 'macos-latest'
+
+    env:
+      SIGNING_GNUPG_KEY: '${{ secrets.SIGNING_GNUPG_KEY }}'
+      SIGNING_GNUPG_PASSPHRASE: '${{ secrets.SIGNING_GNUPG_PASSPHRASE }}'
 
     steps:
       - name: Checkout
