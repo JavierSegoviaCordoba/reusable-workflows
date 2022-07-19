@@ -26,7 +26,7 @@ jobs:
           token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.0.4
+        uses: actions/cache@v3.0.5
         with:
           path: |
             ~/.konan
