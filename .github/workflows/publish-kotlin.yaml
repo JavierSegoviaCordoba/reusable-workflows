@@ -127,11 +127,10 @@ jobs:
       - name: Restore Kotlin native cache
         uses: actions/cache@v3.0.4
         with:
-          path: |
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v3.4.1
@@ -167,11 +166,10 @@ jobs:
       - name: Restore Kotlin native cache
         uses: actions/cache@v3.0.4
         with:
-          path: |
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v3.4.1
@@ -216,11 +214,10 @@ jobs:
       - name: Restore Kotlin native cache
         uses: actions/cache@v3.0.4
         with:
-          path: |
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v3.4.1
@@ -265,11 +262,10 @@ jobs:
       - name: Restore Kotlin native cache
         uses: actions/cache@v3.0.4
         with:
-          path: |
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v3.4.1
@@ -345,11 +341,10 @@ jobs:
       - name: Restore Kotlin native cache
         uses: actions/cache@v3.0.4
         with:
-          path: |
-            ~/.konan
-          key: ${{ runner.os }}-gradle-${{ hashFiles('**/gradle-wrapper.properties') }}
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
           restore-keys: |
-            ${{ runner.os }}-gradle-
+            ${{ runner.os }}-konan-
 
       - name: Set up Java
         uses: actions/setup-java@v3.4.1
