@@ -3,6 +3,9 @@
     "config:base"
   ],
   "assigneesFromCodeOwners": true,
+  "baseBranches": [
+    "hubdle"
+  ],
   "commitBodyTable": true,
   "gitIgnoredAuthors": [
     "javiersegoviacordoba@gmail.com",
