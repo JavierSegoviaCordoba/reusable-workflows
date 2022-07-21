@@ -314,7 +314,7 @@ jobs:
           path: 'build/reports-generated/code-quality'
 
       - name: Deploy reports to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.3.4
+        uses: JamesIves/github-pages-deploy-action@v4.4.0
         with:
           branch: 'gh-pages'
           folder: 'build/reports-generated/'
@@ -361,7 +361,7 @@ jobs:
         run: ./gradlew buildSite
 
       - name: Deploy docs to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.3.4
+        uses: JamesIves/github-pages-deploy-action@v4.4.0
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
