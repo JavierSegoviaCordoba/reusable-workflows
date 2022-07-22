@@ -17,6 +17,11 @@ on:
         default: 'auto'
         required: true
         type: string
+      restore-kotlin-native-cache:
+        description: 'Restore Kotlin cache, `~/.konan` directory'
+        default: true
+        required: false
+        type: boolean
       gradle-cache:
         description: 'Use Gradle cache'
         default: true
@@ -48,6 +53,7 @@ jobs:
           token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
       - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
         uses: actions/cache@v3.0.5
         with:
           path: ~/.konan

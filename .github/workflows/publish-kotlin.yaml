@@ -72,6 +72,11 @@ on:
         default: true
         required: false
         type: boolean
+      restore-kotlin-native-cache:
+        description: 'Restore Kotlin cache, `~/.konan` directory'
+        default: true
+        required: false
+        type: boolean
       gradle-cache:
         description: 'Use Gradle cache'
         default: true
@@ -125,6 +130,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
         uses: actions/cache@v3.0.5
         with:
           path: ~/.konan
@@ -164,6 +170,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
         uses: actions/cache@v3.0.5
         with:
           path: ~/.konan
@@ -212,6 +219,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
         uses: actions/cache@v3.0.5
         with:
           path: ~/.konan
@@ -260,6 +268,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
         uses: actions/cache@v3.0.5
         with:
           path: ~/.konan
@@ -339,6 +348,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
         uses: actions/cache@v3.0.5
         with:
           path: ~/.konan
