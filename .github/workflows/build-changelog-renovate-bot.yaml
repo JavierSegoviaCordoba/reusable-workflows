@@ -32,7 +32,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.0.5
+        uses: actions/cache@v3.0.6
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
