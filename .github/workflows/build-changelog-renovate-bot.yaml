@@ -13,6 +13,11 @@ on:
         default: true
         required: false
         type: string
+      gradle-cache-cleanup:
+        description: 'Enable removing unnecessary Gradle home cache'
+        default: true
+        required: false
+        type: string
     secrets:
       TOKEN_GITHUB_ACTION:
         required: true
@@ -46,9 +51,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
         run: ./gradlew addChangelogItem --renovateCommitTable

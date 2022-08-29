@@ -82,6 +82,11 @@ on:
         default: true
         required: false
         type: string
+      gradle-cache-cleanup:
+        description: 'Enable removing unnecessary Gradle home cache'
+        default: true
+        required: false
+        type: string
     secrets:
       ANALYSIS_SONAR_LOGIN:
         required: false
@@ -145,9 +150,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }}
@@ -234,9 +240,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
@@ -283,9 +290,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Download reports
         uses: actions/download-artifact@v3
@@ -363,9 +371,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Generate Site docs
         run: ./gradlew buildSite

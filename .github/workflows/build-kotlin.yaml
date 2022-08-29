@@ -22,6 +22,11 @@ on:
         default: true
         required: false
         type: string
+      gradle-cache-cleanup:
+        description: 'Enable removing unnecessary Gradle home cache'
+        default: true
+        required: false
+        type: string
       gradle-args:
         description: 'Gradle args for every steps'
         default: ''
@@ -167,9 +172,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: All tests
         run: ./gradlew allTests ${{ inputs.gradle-args-all-tests }} ${{ inputs.gradle-args }}
@@ -215,9 +221,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Check API
         run: ./gradlew checkApi ${{ inputs.gradle-args-api-check }} ${{ inputs.gradle-args }}
@@ -253,9 +260,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Assemble
         run: ./gradlew assemble ${{ inputs.gradle-args-assemble }} ${{ inputs.gradle-args }}
@@ -287,9 +295,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Code analysis
         run: ./gradlew checkAnalysis ${{ inputs.gradle-args-code-analysis-check }} ${{ inputs.gradle-args }}
@@ -332,9 +341,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Code format
         run: ./gradlew checkFormat ${{ inputs.gradle-args-code-format-check }} ${{ inputs.gradle-args }}
@@ -407,9 +417,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Download all tests reports
         uses: actions/download-artifact@v3
@@ -506,9 +517,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Publish snapshot
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
@@ -547,9 +559,10 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.2.5
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Set semver as output
         id: semver
