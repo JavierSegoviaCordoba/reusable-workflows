@@ -322,7 +322,7 @@ jobs:
         if: (inputs.code-coverage-report == true)
         run: |
           mkdir -p build/reports-generated/code-coverage
-          mv build/reports/kover/html/* build/reports-generated/code-coverage
+          mv build/reports/kover/merged/html/* build/reports-generated/code-coverage
 
       - name: Download code quality reports
         uses: actions/download-artifact@v3

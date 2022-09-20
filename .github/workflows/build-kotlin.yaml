@@ -450,9 +450,9 @@ jobs:
       - name: Rename code coverage report
         if: (inputs.code-coverage-report == true)
         run: |
-          mv ${{ runner.temp }}/reports/code-coverage/html build/reports-generated/code-coverage
+          mv ${{ runner.temp }}/reports/code-coverage/merged/html build/reports-generated/code-coverage
           mkdir -p build/reports/kover
-          mv ${{ runner.temp }}/reports/code-coverage/report.xml build/reports/kover/report.xml
+          mv ${{ runner.temp }}/reports/code-coverage/merged/xml/report.xml build/reports/kover/report.xml
 
       - name: Download code quality reports
         uses: actions/download-artifact@v3
