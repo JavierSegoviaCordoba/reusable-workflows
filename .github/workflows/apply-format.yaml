@@ -1,4 +1,4 @@
-name: build-changelog-renovate
+name: apply-format
 
 on:
   workflow_call:
@@ -23,9 +23,7 @@ on:
         required: true
 
 jobs:
-  add-updated-dependencies-to-changelog:
-    if: github.actor == 'renovate[bot]'
-
+  apply-format:
     runs-on: 'ubuntu-latest'
 
     steps:
@@ -51,13 +49,13 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.3.1
+        uses: gradle/gradle-build-action@v2.3.0
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
-      - name: Add updated dependencies to the CHANGELOG from Renovate
-        run: ./gradlew addChangelogItem --renovateCommitTable
+      - name: Apply format
+        run: ./gradlew applyFormat
 
       - name: Commit and push
         run: |
