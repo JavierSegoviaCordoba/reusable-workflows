@@ -159,7 +159,7 @@ jobs:
         run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }}
 
       - name: Upload reports
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: 'reports-${{ matrix.os }}'
           path: 'build/reports'
@@ -194,7 +194,7 @@ jobs:
         uses: JetBrains/qodana-action@v2022.2.2
 
       - name: Upload code quality report
-        uses: actions/upload-artifact@v3.1.0
+        uses: actions/upload-artifact@v3.1.1
         with:
           name: 'report-code-quality'
           path: ${{ runner.temp }}/qodana/results/report
