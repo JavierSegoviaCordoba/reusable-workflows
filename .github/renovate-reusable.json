@@ -1,0 +1,29 @@
+{
+  "extends": [
+    "config:base"
+  ],
+  "assigneesFromCodeOwners": true,
+  "commitBodyTable": true,
+  "packageRules": [
+    {
+      "matchPackagePatterns": [
+        "androidx.compose.*"
+      ],
+      "groupName": "androidx.compose.*"
+    },
+    {
+      "matchPackagePatterns": [
+        "io.kotest.*"
+      ],
+      "groupName": "io.kotest.*"
+    },
+    {
+      "matchPackagePatterns": [
+        "io.ktor.*"
+      ],
+      "groupName": "io.ktor.*"
+    }
+  ],
+  "prConcurrentLimit": 1,
+  "rebaseWhen": "never"
+}
