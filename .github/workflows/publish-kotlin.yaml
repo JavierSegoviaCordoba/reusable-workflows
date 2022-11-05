@@ -337,7 +337,7 @@ jobs:
           folder: 'build/reports-generated/'
           clean: true
           single-commit: false
-          commit-message: 'Deploy ${{ steps.semver.outputs.semver }} reports'
+          commit-message: 'Deploy ${{ steps.semver.outputs.SEMVER }} reports'
           target-folder: 'reports-generated/'
           clean-exclude: |
             !reports-generated/**

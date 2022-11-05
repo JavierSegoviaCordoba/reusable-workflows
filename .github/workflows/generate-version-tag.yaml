@@ -101,7 +101,7 @@ jobs:
           git config --local user.name "GitHub Action"
           git diff
           git add .
-          git commit -m "Publish ${{ steps.semver.outputs.semver }}" -a
+          git commit -m "Publish ${{ steps.semver.outputs.SEMVER }}" -a
 
       - name: Generate Tag
         run: ./gradlew createSemverTag -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}

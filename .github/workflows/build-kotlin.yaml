@@ -476,7 +476,7 @@ jobs:
           folder: 'build/reports-generated/'
           clean: true
           single-commit: false
-          commit-message: 'Deploy ${{ steps.semver.outputs.semver }} reports'
+          commit-message: 'Deploy ${{ steps.semver.outputs.SEMVER }} reports'
           target-folder: 'reports-generated/'
           clean-exclude: |
             !reports-generated/**
@@ -578,7 +578,7 @@ jobs:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
           single-commit: false
-          commit-message: 'Deploy ${{ steps.semver.outputs.semver }} all docs'
+          commit-message: 'Deploy ${{ steps.semver.outputs.SEMVER }} all docs'
           clean: true
           clean-exclude: |
             api/versions/**
@@ -592,7 +592,7 @@ jobs:
           folder: 'build/docs/_site/api/snapshot/'
           target-folder: 'api/snapshot/'
           single-commit: false
-          commit-message: 'Deploy ${{ steps.semver.outputs.semver }} API docs and reports'
+          commit-message: 'Deploy ${{ steps.semver.outputs.SEMVER }} API docs and reports'
           clean: true
           clean-exclude: |
             !api/snapshot/**
