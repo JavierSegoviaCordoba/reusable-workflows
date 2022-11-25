@@ -155,6 +155,13 @@ jobs:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
+      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          xcode-version: '13.4.1'
+
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }}
 
@@ -244,6 +251,12 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
+
+      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '13.4.1'
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)

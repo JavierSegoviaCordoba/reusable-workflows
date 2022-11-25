@@ -177,6 +177,14 @@ jobs:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
+      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          xcode-version: '13.4.1'
+
+
       - name: All tests
         run: ./gradlew allTests ${{ inputs.gradle-args-all-tests }} ${{ inputs.gradle-args }}
 
@@ -264,6 +272,13 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
+
+      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        if: matrix.os == 'macos-latest'
+        with:
+          xcode-version: '13.4.1'
 
       - name: Assemble
         run: ./gradlew assemble ${{ inputs.gradle-args-assemble }} ${{ inputs.gradle-args }}
@@ -521,6 +536,13 @@ jobs:
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
+
+      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
+      - name: Setup Xcode
+        uses: maxim-lobanov/setup-xcode@v1
+        with:
+          xcode-version: '13.4.1'
+
 
       - name: Publish snapshot
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
