@@ -198,7 +198,9 @@ jobs:
           java-version: 11
 
       - name: Code quality
-        uses: JetBrains/qodana-action@v2022.2.2
+        uses: JetBrains/qodana-action@v2022.2.4
+        with:
+          cache-default-branch-only: true
 
       - name: Upload code quality report
         uses: actions/upload-artifact@v3.1.1
