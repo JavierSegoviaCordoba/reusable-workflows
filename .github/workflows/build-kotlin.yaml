@@ -166,7 +166,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -223,7 +223,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -262,7 +262,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -304,7 +304,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -350,7 +350,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -385,7 +385,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -428,7 +428,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -528,7 +528,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
@@ -577,7 +577,7 @@ jobs:
             ${{ runner.os }}-konan-
 
       - name: Set up Java
-        uses: actions/setup-java@v3.7.0
+        uses: actions/setup-java@v3.8.0
         with:
           distribution: 'zulu'
           java-version: 11
