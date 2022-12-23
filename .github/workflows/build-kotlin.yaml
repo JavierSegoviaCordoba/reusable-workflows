@@ -158,7 +158,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -215,7 +215,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -254,7 +254,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -296,7 +296,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -342,7 +342,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -377,7 +377,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -420,7 +420,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -520,7 +520,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
@@ -569,7 +569,7 @@ jobs:
 
       - name: Restore Kotlin native cache
         if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.2.0
+        uses: actions/cache@v3.2.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
