@@ -165,11 +165,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -222,11 +233,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -261,11 +283,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -303,11 +336,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -349,11 +393,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -384,11 +439,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Code quality
         uses: JetBrains/qodana-action@v2022.3.0
@@ -427,11 +493,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -527,11 +604,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
@@ -576,11 +664,22 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-konan-
 
+      - name: Create Gradle files
+        run: |
+          cd ~
+          mkdir -p .gradle/ && touch .gradle/gradle.properties
+
       - name: Set up Java
+        id: setup-java
         uses: actions/setup-java@v3.9.0
         with:
           distribution: 'zulu'
           java-version: 11
+
+      - name: Setup Gradle Java installations paths
+        run: |
+          cd ~/.gradle
+          echo "org.gradle.java.installations.paths=${{ steps.setup-java.outputs.path }}" >> gradle.properties
 
       - name: Setup Gradle
         uses: gradle/gradle-build-action@v2.3.3
