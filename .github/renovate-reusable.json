@@ -3,7 +3,7 @@
     "config:base"
   ],
   "assigneesFromCodeOwners": true,
-  "branchConcurrentLimit": 3,
+  "branchConcurrentLimit": 2,
   "commitBodyTable": true,
   "packageRules": [
     {
