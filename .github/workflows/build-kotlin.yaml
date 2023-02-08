@@ -393,7 +393,7 @@ jobs:
 
       - name: Code quality with Qodana Cloud
         if: ${{ startsWith(env.QODANA_TOKEN, 'ey') }}
-        uses: JetBrains/qodana-action@v2022.3.0
+        uses: JetBrains/qodana-action@v2022.3.2
         with:
           cache-default-branch-only: true
 
