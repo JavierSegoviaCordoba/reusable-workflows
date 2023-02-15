@@ -198,7 +198,7 @@ jobs:
           java-version: 11
 
       - name: Code quality
-        uses: JetBrains/qodana-action@v2022.3.3
+        uses: JetBrains/qodana-action@v2022.3.4
         with:
           cache-default-branch-only: true
 
