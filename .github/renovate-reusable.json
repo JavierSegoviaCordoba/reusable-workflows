@@ -3,6 +3,8 @@
     "config:base"
   ],
   "assigneesFromCodeOwners": true,
+  "automerge": true,
+  "automergeType": "pr",
   "branchConcurrentLimit": 2,
   "commitBodyTable": true,
   "packageRules": [
@@ -31,6 +33,7 @@
       "groupName": "io.ktor.*"
     }
   ],
+  "platformAutomerge": true,
   "prConcurrentLimit": 1,
   "rebaseWhen": "never"
 }
