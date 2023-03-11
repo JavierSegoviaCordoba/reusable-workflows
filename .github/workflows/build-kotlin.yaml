@@ -32,58 +32,13 @@ on:
         default: ''
         required: false
         type: string
-      all-tests:
-        description: 'Enable running all tests'
+      build:
+        description: 'Enable running build'
         default: true
         required: false
         type: boolean
-      gradle-args-all-tests:
+      gradle-args-build:
         description: 'Gradle args for `All tests` step'
-        default: ''
-        required: false
-        type: string
-      code-coverage-report:
-        description: 'Enable code coverage report'
-        default: true
-        required: false
-        type: boolean
-      api-check:
-        description: 'Enable checking API changes'
-        default: true
-        required: false
-        type: boolean
-      gradle-args-api-check:
-        description: 'Gradle args for `Check API` step'
-        default: ''
-        required: false
-        type: string
-      assemble:
-        description: 'Enable running assemble'
-        default: true
-        required: false
-        type: boolean
-      gradle-args-assemble:
-        description: 'Gradle args for `Assemble` step'
-        default: ''
-        required: false
-        type: string
-      code-analysis-check:
-        description: 'Enable code analysis'
-        default: true
-        required: false
-        type: boolean
-      gradle-args-code-analysis-check:
-        description: 'Gradle args for `Code analysis` step'
-        default: ''
-        required: false
-        type: string
-      code-format-check:
-        description: 'Enable checking code format'
-        default: true
-        required: false
-        type: boolean
-      gradle-args-code-format-check:
-        description: 'Gradle args for `Code format` step'
         default: ''
         required: false
         type: string
@@ -107,13 +62,8 @@ on:
         default: true
         required: false
         type: boolean
-      deploy-reports:
-        description: 'Deploy reports to GitHub Pages and SonarQube'
-        default: true
-        required: false
-        type: boolean
-      gradle-args-update-sonarqube:
-        description: 'Gradle args for `Update SonarQube` step'
+      gradle-args-sonar:
+        description: 'Gradle args for `Update Sonar` step'
         default: ''
         required: false
         type: string
@@ -128,6 +78,8 @@ on:
         required: false
         type: string
     secrets:
+      ANALYSIS_QODANA_TOKEN:
+        required: false
       ANALYSIS_SONAR_LOGIN:
         required: false
       NEXUS_STAGING_PROFILE_ID:
@@ -138,12 +90,13 @@ on:
         required: false
 
 env:
+  ANALYSIS_SONAR_LOGIN: ${{ secrets.ANALYSIS_SONAR_LOGIN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  QODANA_TOKEN: ${{ secrets.QODANA_TOKEN }}
+  QODANA_TOKEN: ${{ secrets.ANALYSIS_QODANA_TOKEN }}
 
 jobs:
-  all-tests:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.all-tests)
+  build:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.build)
 
     runs-on: ${{ matrix.os }}
 
@@ -185,9 +138,8 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
-
-      - name: All tests
-        run: ./gradlew allTests ${{ inputs.gradle-args-all-tests }} ${{ inputs.gradle-args }}
+      - name: Build
+        run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
 
       - name: Upload all tests report
         if: always()
@@ -197,173 +149,21 @@ jobs:
           path: 'build/reports/allTests'
 
       - name: Upload code coverage report
-        if: (inputs.code-coverage-report == true)
+        if: always()
         uses: actions/upload-artifact@v3.1.2
         with:
           name: 'report-code-coverage-${{ matrix.os }}'
           path: 'build/reports/kover'
 
-  api-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.api-check == true)
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
-        with:
-          fetch-depth: 0
-
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.3.0
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
-
-      - name: Check API
-        run: ./gradlew checkApi ${{ inputs.gradle-args-api-check }} ${{ inputs.gradle-args }}
-
-  assemble:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.assemble == true)
-
-    runs-on: ${{ matrix.os }}
-
-    strategy:
-      matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
-        with:
-          fetch-depth: 0
-
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.3.0
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
-
-      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        if: matrix.os == 'macos-latest'
-        with:
-          xcode-version: '13.4.1'
-
-      - name: Assemble
-        run: ./gradlew assemble ${{ inputs.gradle-args-assemble }} ${{ inputs.gradle-args }}
-
-  code-analysis-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-analysis-check == true)
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
-        with:
-          fetch-depth: 0
-
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.3.0
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
-
-      - name: Code analysis
-        run: ./gradlew checkAnalysis ${{ inputs.gradle-args-code-analysis-check }} ${{ inputs.gradle-args }}
+      - name: Update Sonar
+        if: matrix.os == 'ubuntu-latest'
+        run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
 
       - name: Upload Code Scanning code analysis report
+        if: matrix.os == 'ubuntu-latest'
         uses: github/codeql-action/upload-sarif@v2
         with:
           sarif_file: 'build/reports/detekt/detekt.sarif'
-
-      - name: Upload code analysis report
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: 'report-code-analysis'
-          path: 'build/reports/detekt'
-
-  code-format-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-format-check == true)
-
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
-        with:
-          fetch-depth: 0
-
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.3.0
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
-
-      - name: Code format
-        run: ./gradlew checkFormat ${{ inputs.gradle-args-code-format-check }} ${{ inputs.gradle-args }}
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
@@ -403,115 +203,12 @@ jobs:
         with:
           cache-default-branch-only: true
 
-      - name: Upload code quality report
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: 'report-code-quality'
-          path: ${{ runner.temp }}/qodana/results/report
-
-  deploy-reports:
-    if: |
-      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.deploy-reports == true))
-
-    needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
-
-    runs-on: 'ubuntu-latest'
-
-    env:
-      ANALYSIS_SONAR_LOGIN: '${{ secrets.ANALYSIS_SONAR_LOGIN }}'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
-        with:
-          fetch-depth: 0
-
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.3.0
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
-
-      - name: Download all tests reports
-        uses: actions/download-artifact@v3
-        with:
-          name: 'report-all-tests-ubuntu-latest'
-          path: 'build/reports-generated/all-tests'
-
-      - name: Download code analysis reports
-        uses: actions/download-artifact@v3
-        with:
-          name: 'report-code-analysis'
-          path: 'build/reports-generated/code-analysis/'
-
-      - name: Rename code analysis report
-        run: |
-          mkdir -p build/reports/detekt
-          cp build/reports-generated/code-analysis/detekt.xml build/reports/detekt/detekt.xml
-          mv build/reports-generated/code-analysis/detekt.html build/reports-generated/code-analysis/index.html
-
-      - name: Download code coverage reports
-        if: (inputs.code-coverage-report == true)
-        uses: actions/download-artifact@v3
-        with:
-          name: 'report-code-coverage-ubuntu-latest'
-          path: '${{ runner.temp }}/reports/code-coverage'
-
-      - name: Rename code coverage report
-        if: (inputs.code-coverage-report == true)
-        run: |
-          mv ${{ runner.temp }}/reports/code-coverage/merged/html build/reports-generated/code-coverage
-          mkdir -p build/reports/kover
-          mv ${{ runner.temp }}/reports/code-coverage/merged/xml/report.xml build/reports/kover/report.xml
-
-      - name: Download code quality reports
-        uses: actions/download-artifact@v3
-        with:
-          name: 'report-code-quality'
-          path: 'build/reports-generated/code-quality'
-
-      - name: Set semver as output
-        id: semver
-        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
-        run: ./gradlew printSemver --githubOnlyRoot --githubOutput
-
-      - name: Update SonarQube
-        run: ./gradlew sonarqube ${{ inputs.gradle-args-update-sonarqube }} ${{ inputs.gradle-args }}
-
-      - name: Deploy reports to GitHub Pages
-        if: (github.event_name == 'push') || (github.event_name == 'workflow_dispatch')
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
-        with:
-          branch: 'gh-pages'
-          folder: 'build/reports-generated/'
-          clean: true
-          single-commit: false
-          commit-message: 'Deploy ${{ steps.semver.outputs.SEMVER }} reports'
-          target-folder: 'reports-generated/'
-          clean-exclude: |
-            !reports-generated/**
-
   publish-snapshot:
     if: |
       !cancelled() && !failure() &&
       (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-snapshot == true))
 
-    needs: [ all-tests, api-check, assemble, code-analysis-check, code-format-check, code-quality-check ]
+    needs: [ build, code-quality-check ]
 
     runs-on: 'macos-latest'
 

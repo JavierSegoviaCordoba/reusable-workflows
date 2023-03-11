@@ -57,16 +57,11 @@ on:
         default: ''
         required: false
         type: string
-      gradle-args-publish-update-sonarqube:
-        description: 'Gradle args for `Update SonarQube` step'
+      gradle-args-sonar:
+        description: 'Gradle args for `Update Sonar` step'
         default: ''
         required: false
         type: string
-      deploy-reports:
-        description: 'Deploy reports to GitHub Pages and SonarQube'
-        default: true
-        required: false
-        type: boolean
       publish-github-release:
         description: 'Publish GitHub release'
         default: true
@@ -88,6 +83,8 @@ on:
         required: false
         type: string
     secrets:
+      ANALYSIS_QODANA_TOKEN:
+        required: false
       ANALYSIS_SONAR_LOGIN:
         required: false
       NEXUS_STAGING_PROFILE_ID:
@@ -114,7 +111,9 @@ on:
         required: false
 
 env:
+  ANALYSIS_SONAR_LOGIN: ${{ secrets.ANALYSIS_SONAR_LOGIN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  QODANA_TOKEN: ${{ secrets.ANALYSIS_QODANA_TOKEN }}
   SIGNING_GNUPG_KEY: '${{ secrets.SIGNING_GNUPG_KEY }}'
   SIGNING_GNUPG_PASSPHRASE: '${{ secrets.SIGNING_GNUPG_PASSPHRASE }}'
 
@@ -171,6 +170,16 @@ jobs:
           name: 'reports-${{ matrix.os }}'
           path: 'build/reports'
 
+      - name: Update Sonar
+        if: matrix.os == 'ubuntu-latest'
+        run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
+
+      - name: Upload Code Scanning code analysis report
+        if: matrix.os == 'ubuntu-latest'
+        uses: github/codeql-action/upload-sarif@v2
+        with:
+          sarif_file: 'build/reports/detekt/detekt.sarif'
+
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
 
@@ -197,16 +206,17 @@ jobs:
           distribution: 'zulu'
           java-version: 11
 
-      - name: Code quality
+      - name: Code quality with Qodana Cloud
+        if: ${{ startsWith(env.QODANA_TOKEN, 'ey') }}
         uses: JetBrains/qodana-action@v2022.3.4
         with:
           cache-default-branch-only: true
 
-      - name: Upload code quality report
-        uses: actions/upload-artifact@v3.1.2
+      - name: Code quality
+        if: ${{ !startsWith(env.QODANA_TOKEN, 'ey') }}
+        uses: JetBrains/qodana-action@v2022.3.4
         with:
-          name: 'report-code-quality'
-          path: ${{ runner.temp }}/qodana/results/report
+          cache-default-branch-only: true
 
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
@@ -216,7 +226,6 @@ jobs:
     runs-on: 'macos-latest'
 
     env:
-      ANALYSIS_SONAR_LOGIN: '${{ secrets.ANALYSIS_SONAR_LOGIN }}'
       GRADLE_PUBLISH_KEY: '${{ secrets.GRADLE_PUBLISH_KEY }}'
       GRADLE_PUBLISH_SECRET: '${{ secrets.GRADLE_PUBLISH_SECRET }}'
       JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN: '${{ secrets.JETBRAINS_MARKETPLACE_CERTIFICATE_CHAIN }}'
@@ -272,90 +281,6 @@ jobs:
         if: (inputs.publish-jetbrains-marketplace == true)
         run: ./gradlew publishPlugin ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
 
-  deploy-reports:
-    if: |
-      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-reports == true))
-
-    needs: [ build, code-quality-check ]
-
-    runs-on: 'ubuntu-latest'
-
-    env:
-      ANALYSIS_SONAR_LOGIN: '${{ secrets.ANALYSIS_SONAR_LOGIN }}'
-
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v3.3.0
-        with:
-          fetch-depth: 0
-
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
-        uses: actions/cache@v3.3.0
-        with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
-
-      - name: Set up Java
-        uses: actions/setup-java@v3.10.0
-        with:
-          distribution: 'zulu'
-          java-version: 11
-
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
-        with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
-
-      - name: Download reports
-        uses: actions/download-artifact@v3
-        with:
-          name: 'reports-ubuntu-latest'
-          path: 'build/reports'
-
-      - name: Update SonarQube
-        run: ./gradlew sonarqube ${{ inputs.gradle-args-update-sonarqube }} ${{ inputs.gradle-args }}
-
-      - name: printSemver
-        id: semver
-        run: ./gradlew printSemver --githubOnlyRoot --githubOutput
-
-      - name: Move all tests reports
-        run: |
-          mkdir -p build/reports-generated/all-tests
-          mv build/reports/allTests/* build/reports-generated/all-tests
-
-      - name: Move code analysis reports
-        run: |
-          mkdir -p build/reports-generated/code-analysis
-          mv build/reports/detekt/detekt.html build/reports-generated/code-analysis/index.html
-
-      - name: Move code coverage reports
-        if: (inputs.code-coverage-report == true)
-        run: |
-          mkdir -p build/reports-generated/code-coverage
-          mv build/reports/kover/merged/html/* build/reports-generated/code-coverage
-
-      - name: Download code quality reports
-        uses: actions/download-artifact@v3
-        with:
-          name: 'report-code-quality'
-          path: 'build/reports-generated/code-quality'
-
-      - name: Deploy reports to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
-        with:
-          branch: 'gh-pages'
-          folder: 'build/reports-generated/'
-          clean: true
-          single-commit: false
-          commit-message: 'Deploy ${{ steps.semver.outputs.SEMVER }} reports'
-          target-folder: 'reports-generated/'
-          clean-exclude: |
-            !reports-generated/**
 
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
