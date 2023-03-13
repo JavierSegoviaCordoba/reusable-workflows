@@ -24,7 +24,7 @@ jobs:
           fetch-depth: 0
 
       - name: Restore Kotlin native cache
-        uses: actions/cache@v3.3.0
+        uses: actions/cache@v3.3.1
         with:
           path: ~/.konan
           key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
