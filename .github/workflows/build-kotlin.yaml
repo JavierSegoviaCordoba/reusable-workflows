@@ -146,24 +146,18 @@ jobs:
         uses: actions/upload-artifact@v3.1.2
         with:
           name: 'report-all-tests-${{ matrix.os }}'
-          path: 'build/reports/allTests'
+          path: '**/build/reports/allTests'
 
       - name: Upload code coverage report
         if: always()
         uses: actions/upload-artifact@v3.1.2
         with:
           name: 'report-code-coverage-${{ matrix.os }}'
-          path: 'build/reports/kover'
+          path: '**/build/reports/kover'
 
       - name: Update Sonar
         if: matrix.os == 'ubuntu-latest'
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
-
-      - name: Upload Code Scanning code analysis report
-        if: matrix.os == 'ubuntu-latest'
-        uses: github/codeql-action/upload-sarif@v2
-        with:
-          sarif_file: 'build/reports/detekt/detekt.sarif'
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
