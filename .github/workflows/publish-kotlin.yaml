@@ -149,7 +149,7 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
+        uses: gradle/gradle-build-action@v2.4.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
@@ -252,7 +252,7 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
+        uses: gradle/gradle-build-action@v2.4.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
@@ -305,7 +305,7 @@ jobs:
           java-version: 11
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.4.0
+        uses: gradle/gradle-build-action@v2.4.1
         with:
           cache-disabled: ${{ inputs.gradle-cache == 'false' }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
