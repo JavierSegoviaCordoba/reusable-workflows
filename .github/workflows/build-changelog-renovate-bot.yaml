@@ -8,9 +8,11 @@ on:
         default: true
         required: false
         type: boolean
+      gradle-args:
+        description: `Gradle args for Add updated dependencies step`
       gradle-cache:
         description: 'Use Gradle cache'
-        default: true
+        default: ''
         required: false
         type: string
       gradle-cache-cleanup:
@@ -57,7 +59,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
-        run: ./gradlew addChangelogItem --renovateCommitTable
+        run: ./gradlew addChangelogItem --renovateCommitTable ${{ inputs.gradle-args }}
 
       - name: Commit and push
         run: |
