@@ -37,6 +37,11 @@ on:
         default: true
         required: false
         type: boolean
+      gradle-args:
+        description: 'Gradle args for every steps'
+        default: ''
+        required: false
+        type: string
       gradle-args-build:
         description: 'Gradle args for `build` step'
         default: ''
@@ -162,7 +167,7 @@ jobs:
           xcode-version: '13.4.1'
 
       - name: Build
-        run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }}
+        run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.2
@@ -265,19 +270,18 @@ jobs:
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository ${{ inputs.gradle-args-publish-maven-central }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
-        run: ./gradlew publishPlugins --no-parallel ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }}
+        run: ./gradlew publishPlugins --no-parallel ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }} ${{ inputs.gradle-args }}
 
       - name: Publish to JetBrains marketplace
         if: (inputs.publish-jetbrains-marketplace == true)
-        run: ./gradlew publishPlugin ${{ inputs.gradle-args-publish-jetbrains-marketplace }}
-
+        run: ./gradlew publishPlugin ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }}
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (inputs.gradle-args == '')
 
     needs: publish
 
@@ -311,7 +315,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Generate Site docs
-        run: ./gradlew buildSite
+        run: ./gradlew buildSite ${{ inputs.gradle-args }}
 
       - name: Deploy docs to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.4.1
@@ -326,7 +330,7 @@ jobs:
             reports-generated/**
 
   github-release:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true)
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (inputs.gradle-args == '')
 
     needs: publish
 
@@ -345,4 +349,26 @@ jobs:
           DRAFT_RELEASE: false
           PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
           CHANGELOG_FILE: 'CHANGELOG.md'
+          ALLOW_EMPTY_CHANGELOG: true
+
+  github-release-catalog:
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && contains(inputs.gradle-args, 'tagPrefix=c')
+
+    needs: publish
+
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 0
+
+      - name: Publish GitHub Release
+        uses: anton-yurchenko/git-release@v5.0.2
+        env:
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          DRAFT_RELEASE: false
+          PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          CHANGELOG_FILE: 'hubdle-version-catalog/CHANGELOG.md'
           ALLOW_EMPTY_CHANGELOG: true

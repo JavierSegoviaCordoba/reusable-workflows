@@ -9,7 +9,7 @@ on:
         required: false
         type: boolean
       gradle-args:
-        description: `Gradle args for Add updated dependencies step`
+        description: 'Gradle args for Add updated dependencies step'
       gradle-cache:
         description: 'Use Gradle cache'
         default: ''
