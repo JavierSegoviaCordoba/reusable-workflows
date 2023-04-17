@@ -8,8 +8,16 @@ on:
         default: true
         required: false
         type: boolean
+      tag-prefix:
+        description: 'Tag prefix to be published'
+        default: ''
+        required: false
+        type: string
       gradle-args:
-        description: 'Gradle args for Add updated dependencies step'
+        description: 'Gradle args for every steps'
+        default: ''
+        required: false
+        type: string
       gradle-cache:
         description: 'Use Gradle cache'
         default: ''
@@ -59,7 +67,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
-        run: ./gradlew addChangelogItem --renovateCommitTable ${{ inputs.gradle-args }}
+        run: ./gradlew addChangelogItem --renovateCommitTable -Psemver.tagPrefix=${{ inputs.tag-prefix }} ${{ inputs.gradle-args }}
 
       - name: Commit and push
         run: |

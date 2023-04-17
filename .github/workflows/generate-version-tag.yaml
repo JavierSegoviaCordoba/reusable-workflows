@@ -22,6 +22,21 @@ on:
         default: true
         required: false
         type: boolean
+      project-path:
+        description: 'Project path to set the version GitHub output'
+        default: ''
+        required: false
+        type: string
+      semver-output-field:
+        description: 'Semver output for root or nested modules'
+        default: 'SEMVER'
+        required: false
+        type: string
+      tag-prefix:
+        description: 'Tag prefix to be published'
+        default: ''
+        required: false
+        type: string
       gradle-cache:
         description: 'Use Gradle cache'
         default: true
@@ -84,12 +99,35 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
-      - name: Build
-        run: ./gradlew build -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
+      - name: Set project versions as outputs
+        id: semver-outputs
+        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
 
-      - name: Set semver as output
+      - name: Set PUBLISH_VERSION output
+        shell: kotlin -howtorun .main.kts {0}
         id: semver
-        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
+        run: |
+          import java.io.File
+
+          fun File.putVariable(key: String, value: String) {
+              val lines = readLines().toMutableList()
+              val keyIndex = lines.indexOfFirst { line -> line.substringBefore('=') == key }
+              if (keyIndex != -1) lines[keyIndex] = value else lines.add("$key=$value")
+              writeText(lines.joinToString("\n"))
+          }
+          val outputs = """${{ toJSON(steps.semver-outputs.outputs) }}"""
+          val version =
+              outputs
+                  .lines()
+                  .first { it.contains("${{ inputs.semver-output-field }}") }
+                  .substringBeforeLast('"')
+                  .substringAfterLast('"')
+          println(version)
+          val githubOutputFile = File(System.getenv("GITHUB_OUTPUT"))
+          githubOutputFile.putVariable("PUBLISH_VERSION", version)
+
+#      - name: Build
+#        run: ./gradlew build -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Upload reports
         if: failure()
@@ -99,7 +137,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Patch Changelog and regenerate README badges
-        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
+        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
 
       - name: Commit
         run: |
@@ -107,10 +145,10 @@ jobs:
           git config --local user.name "GitHub Action"
           git diff
           git add .
-          git commit -m "Publish ${{ steps.semver.outputs.SEMVER }}" -a
+          git commit -m "Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}" -a
 
       - name: Generate Tag
-        run: ./gradlew createSemverTag -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
+        run: ./gradlew createSemverTag -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Push
         run: git push --follow-tags

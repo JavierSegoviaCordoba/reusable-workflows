@@ -246,7 +246,6 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
-
       - name: Publish snapshot
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
 

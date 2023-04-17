@@ -87,6 +87,16 @@ on:
         default: true
         required: false
         type: string
+      changelog-file:
+        description: 'Changelog file path for empty tag prefix'
+        default: 'CHANGELOG.md'
+        required: false
+        type: string
+      changelog-file-c-tag-prefix:
+        description: 'Changelog file path for c tag prefix'
+        default: 'CHANGELOG.md'
+        required: false
+        type: string
     secrets:
       ANALYSIS_QODANA_TOKEN:
         required: false
@@ -123,8 +133,31 @@ env:
   SIGNING_GNUPG_PASSPHRASE: '${{ secrets.SIGNING_GNUPG_PASSPHRASE }}'
 
 jobs:
+  tag-prefix:
+    runs-on: 'ubuntu-latest'
+
+    outputs:
+      tag-prefix: ${{ steps.tag-prefix.outputs.tag-prefix }}
+
+    steps:
+      - name: Calculate tag prefix output
+        id: tag-prefix
+        run: |
+          echo "github.ref_name: ${{ github.ref_name }}"
+          version="${{ github.ref_name }}"
+          if [[ $version =~ ^([a-zA-Z]*)[0-9]?.* ]]; then
+            prefix="${BASH_REMATCH[1]}"
+            echo "tag-prefix=$prefix" >> "$GITHUB_OUTPUT"
+          else
+            echo "Invalid version format"
+            exit 1
+          fi
+          echo "Prefix: $prefix"
+
   build:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+
+    needs: tag-prefix
 
     runs-on: ${{ matrix.os }}
 
@@ -167,7 +200,7 @@ jobs:
           xcode-version: '13.4.1'
 
       - name: Build
-        run: ./gradlew build ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
+        run: ./gradlew build "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.2
@@ -177,7 +210,7 @@ jobs:
 
       - name: Update Sonar
         if: matrix.os == 'ubuntu-latest'
-        run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
+        run: ./gradlew sonar "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
@@ -220,7 +253,7 @@ jobs:
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
-    needs: [ build, code-quality-check ]
+    needs: [ tag-prefix, build, code-quality-check ]
 
     runs-on: 'macos-latest'
 
@@ -270,20 +303,20 @@ jobs:
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
-        run: ./gradlew publishPlugins --no-parallel ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }} ${{ inputs.gradle-args }}
+        run: ./gradlew publishPlugins --no-parallel "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }} ${{ inputs.gradle-args }}
 
       - name: Publish to JetBrains marketplace
         if: (inputs.publish-jetbrains-marketplace == true)
-        run: ./gradlew publishPlugin ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }}
+        run: ./gradlew publishPlugin "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }}
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (inputs.gradle-args == '')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
 
-    needs: publish
+    needs: [ tag-prefix, publish ]
 
     runs-on: 'ubuntu-latest'
 
@@ -315,7 +348,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Generate Site docs
-        run: ./gradlew buildSite ${{ inputs.gradle-args }}
+        run: ./gradlew buildSite "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args }}
 
       - name: Deploy docs to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.4.1
@@ -330,9 +363,9 @@ jobs:
             reports-generated/**
 
   github-release:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (inputs.gradle-args == '')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (needs.tag-prefix.outputs.tag-prefix == '')
 
-    needs: publish
+    needs: [ tag-prefix, publish ]
 
     runs-on: 'ubuntu-latest'
 
@@ -348,13 +381,13 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           DRAFT_RELEASE: false
           PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          CHANGELOG_FILE: 'CHANGELOG.md'
+          CHANGELOG_FILE: '${{ inputs.changelog-file }}'
           ALLOW_EMPTY_CHANGELOG: true
 
   github-release-catalog:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && contains(inputs.gradle-args, 'tagPrefix=c')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (needs.tag-prefix.outputs.tag-prefix == 'c')
 
-    needs: publish
+    needs: [ tag-prefix, publish ]
 
     runs-on: 'ubuntu-latest'
 
@@ -370,5 +403,5 @@ jobs:
           GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
           DRAFT_RELEASE: false
           PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          CHANGELOG_FILE: 'hubdle-version-catalog/CHANGELOG.md'
+          CHANGELOG_FILE: '${{ inputs.changelog-file-c-tag-prefix }}'
           ALLOW_EMPTY_CHANGELOG: true
