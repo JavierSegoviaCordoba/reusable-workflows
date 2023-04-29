@@ -101,7 +101,7 @@ jobs:
 
       - name: Set project versions as outputs
         id: semver-outputs
-        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
+        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false --no-scan
 
       - name: Set PUBLISH_VERSION output
         shell: kotlin -howtorun .main.kts {0}
