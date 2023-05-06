@@ -200,7 +200,7 @@ jobs:
           xcode-version: '13.4.1'
 
       - name: Build
-        run: ./gradlew build "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
+        run: ./gradlew build "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args }}
 
       - name: Upload reports
         uses: actions/upload-artifact@v3.1.2
