@@ -1,0 +1,67 @@
+name: apply-kotlinUpgradeYarnLock
+
+on:
+  workflow_call:
+    inputs:
+      restore-kotlin-native-cache:
+        description: 'Restore Kotlin cache, `~/.konan` directory'
+        default: true
+        required: false
+        type: boolean
+      gradle-cache:
+        description: 'Use Gradle cache'
+        default: true
+        required: false
+        type: string
+      gradle-cache-cleanup:
+        description: 'Enable removing unnecessary Gradle home cache'
+        default: true
+        required: false
+        type: string
+    secrets:
+      TOKEN_GITHUB_ACTION:
+        required: true
+
+jobs:
+  apply-format:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v3.5.2
+        with:
+          fetch-depth: 0
+          token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
+
+      - name: Restore Kotlin native cache
+        if: ${{ inputs.restore-kotlin-native-cache == 'true' }}
+        uses: actions/cache@v3.3.1
+        with:
+          path: ~/.konan
+          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
+          restore-keys: |
+            ${{ runner.os }}-konan-
+
+      - name: Set up Java
+        uses: actions/setup-java@v3.11.0
+        with:
+          distribution: 'zulu'
+          java-version: 17
+
+      - name: Setup Gradle
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
+
+      - name: Apply kotlinUpgradeYarnLock
+        run: ./gradlew kotlinUpgradeYarnLock
+
+      - name: Commit and push
+        run: |
+          git config --global user.email "action@github.com"
+          git config --global user.name "GitHub Action"
+          git diff
+          git add .
+          git commit --amend --no-edit
+          git push --force
