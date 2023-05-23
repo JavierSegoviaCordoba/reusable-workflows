@@ -51,7 +51,7 @@ jobs:
 
       - name: Set Itself version output
         id: semver
-        run: ./gradlew printSemver -Psemver.stage=snapshot --githubOnlyRoot --githubOutput
+        run: ./gradlew printSemver -Psemver.stage=snapshot --githubOnlyRoot --githubOutput --no-scan
 
       - name: Publish next version to MavenLocal
         run: ./gradlew publishToMavenLocal -Psemver.stage=snapshot
