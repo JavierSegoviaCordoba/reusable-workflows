@@ -243,12 +243,14 @@ jobs:
         uses: JetBrains/qodana-action@v2023.1.0
         with:
           cache-default-branch-only: true
+          upload-result: false
 
       - name: Code quality
         if: ${{ !startsWith(env.QODANA_TOKEN, 'ey') }}
         uses: JetBrains/qodana-action@v2023.1.0
         with:
           cache-default-branch-only: true
+          upload-result: false
 
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
