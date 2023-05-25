@@ -380,11 +380,11 @@ jobs:
       - name: Publish GitHub Release
         uses: anton-yurchenko/git-release@v5.0.2
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          DRAFT_RELEASE: false
-          PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          CHANGELOG_FILE: '${{ inputs.changelog-file }}'
           ALLOW_EMPTY_CHANGELOG: true
+          CHANGELOG_FILE: '${{ inputs.changelog-file }}'
+          DRAFT_RELEASE: false
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
 
   github-release-catalog:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (needs.tag-prefix.outputs.tag-prefix == 'c')
@@ -402,8 +402,9 @@ jobs:
       - name: Publish GitHub Release
         uses: anton-yurchenko/git-release@v5.0.2
         env:
-          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
-          DRAFT_RELEASE: false
-          PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          CHANGELOG_FILE: '${{ inputs.changelog-file-c-tag-prefix }}'
           ALLOW_EMPTY_CHANGELOG: true
+          CHANGELOG_FILE: '${{ inputs.changelog-file-c-tag-prefix }}'
+          DRAFT_RELEASE: false
+          GITHUB_TOKEN: '${{ secrets.GITHUB_TOKEN }}'
+          PRE_RELEASE: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          TAG_PREFIX_REGEX: '[c]?'
