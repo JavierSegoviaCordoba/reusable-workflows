@@ -212,7 +212,7 @@ jobs:
       !cancelled() && !failure() &&
       (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-snapshot == true))
 
-    needs: [ build, code-quality-check ]
+    needs: [ build ]
 
     runs-on: 'macos-latest'
 
@@ -264,7 +264,7 @@ jobs:
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true)
 
-    needs: publish-snapshot
+    needs: [ code-quality-check, publish-snapshot ]
 
     runs-on: 'ubuntu-latest'
 

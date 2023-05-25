@@ -255,7 +255,7 @@ jobs:
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
-    needs: [ tag-prefix, build, code-quality-check ]
+    needs: [ tag-prefix, build ]
 
     runs-on: 'macos-latest'
 
@@ -318,7 +318,7 @@ jobs:
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
 
-    needs: [ tag-prefix, publish ]
+    needs: [ code-quality-check, tag-prefix, publish ]
 
     runs-on: 'ubuntu-latest'
 
