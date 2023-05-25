@@ -77,6 +77,11 @@ on:
         default: false
         required: false
         type: string
+      publish-snapshot-tag-prefix:
+        description: 'Publish snapshot based on a custom tag prefix'
+        default: 'null'
+        required: false
+        type: string
     secrets:
       ANALYSIS_QODANA_TOKEN:
         required: false
@@ -251,6 +256,10 @@ jobs:
 
       - name: Publish snapshot
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
+
+      - name: Publish snapshot with custom tag prefix
+        if: ${{ inputs.publish-snapshot-tag-prefix != 'null' }}
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot -Psemver.tagPrefix=${{ inputs.publish-snapshot-tag-prefix }}
 
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true)
