@@ -12,6 +12,11 @@ on:
         default: true
         required: false
         type: boolean
+      machines:
+        default: "[ 'macos-latest', 'ubuntu-latest' ]"
+        description: 'Virtual machine operative systems to run the build job'
+        required: false
+        type: string
 
 jobs:
   build-itself:
@@ -20,9 +25,8 @@ jobs:
     runs-on: ${{ matrix.os }}
 
     strategy:
-      fail-fast: false
       matrix:
-        os: [ 'macos-latest', 'ubuntu-latest' ]
+        os: ${{ fromJson(inputs.machines) }}
 
     steps:
       - name: Checkout

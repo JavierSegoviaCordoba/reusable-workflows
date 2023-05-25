@@ -97,6 +97,11 @@ on:
         default: 'CHANGELOG.md'
         required: false
         type: string
+      machines:
+        default: "[ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]"
+        description: 'Virtual machine operative systems to run the build job'
+        required: false
+        type: string
     secrets:
       ANALYSIS_QODANA_TOKEN:
         required: false
@@ -163,7 +168,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
+        os: ${{ fromJson(inputs.machines) }}
 
     steps:
       - name: Checkout
