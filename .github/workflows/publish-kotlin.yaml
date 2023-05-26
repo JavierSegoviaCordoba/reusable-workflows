@@ -353,7 +353,7 @@ jobs:
         run: ./gradlew buildSite "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args }}
 
       - name: Deploy docs to GitHub Pages
-        uses: JamesIves/github-pages-deploy-action@v4.4.1
+        uses: JamesIves/github-pages-deploy-action@v4.4.2
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
