@@ -350,7 +350,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Generate Site docs
-        run: ./gradlew buildSite "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args }}
+        run: ./gradlew buildSite "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args }} --no-scan
 
       - name: Deploy docs to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4.4.2

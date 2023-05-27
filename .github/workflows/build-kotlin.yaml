@@ -302,10 +302,10 @@ jobs:
 
       - name: Set semver as output
         id: semver
-        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -Psemver.stage=snapshot
+        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -Psemver.stage=snapshot --no-scan
 
       - name: Generate docs
-        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
+        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot --no-scan
 
       - name: Deploy all docs to GitHub Pages
         if: (inputs.publish-all-docs == 'true')
