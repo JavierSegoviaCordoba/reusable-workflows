@@ -130,7 +130,7 @@ jobs:
 #        run: ./gradlew build -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Upload reports
-        if: failure()
+        if: ${{ failure() }}
         uses: actions/upload-artifact@v3.1.2
         with:
           name: 'reports-${{ matrix.os }}'

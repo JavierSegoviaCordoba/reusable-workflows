@@ -148,20 +148,12 @@ jobs:
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
 
       - name: Upload all tests report
-        if: always()
+        if: ${{ failure() }}
         continue-on-error: true
         uses: actions/upload-artifact@v3.1.2
         with:
           name: 'report-all-tests-${{ matrix.os }}'
           path: '**/build/reports/allTests'
-
-      - name: Upload code coverage report
-        if: always()
-        continue-on-error: true
-        uses: actions/upload-artifact@v3.1.2
-        with:
-          name: 'report-code-coverage-${{ matrix.os }}'
-          path: '**/build/reports/kover'
 
       - name: Update Sonar
         if: matrix.os == 'ubuntu-latest'
