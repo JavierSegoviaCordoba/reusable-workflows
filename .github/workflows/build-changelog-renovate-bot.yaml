@@ -86,7 +86,7 @@ jobs:
       - name: Find Pull Request
         if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) }}
         id: find-pull-request
-        uses: kylorhall/find-github-pull-request@1.1.2
+        uses: kylorhall/find-github-pull-request@v1.2.0
 
       - name: Auto Approve
         if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) }}
