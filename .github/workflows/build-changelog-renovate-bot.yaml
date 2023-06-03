@@ -3,6 +3,11 @@ name: build-changelog-renovate
 on:
   workflow_call:
     inputs:
+      auto-approve:
+        description: 'Auto approve Renovate Pull Request'
+        default: true
+        required: false
+        type: boolean
       restore-kotlin-native-cache:
         description: 'Restore Kotlin cache, `~/.konan` directory'
         default: true
@@ -77,3 +82,16 @@ jobs:
           git add .
           git commit --amend --no-edit
           git push --force
+
+      - name: Find Pull Request
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) }}
+        id: find-pull-request
+        uses: kylorhall/find-github-pull-request@1.1.2
+
+      - name: Auto Approve
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) }}
+        uses: hmarr/auto-approve-action@v3.2.1
+        with:
+          github-token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
+          pull-request-number: ${{ steps.find-pull-request.outputs.number }}
+          review-message: "Auto approved"
