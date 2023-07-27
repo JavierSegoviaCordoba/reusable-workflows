@@ -32,13 +32,23 @@ on:
         default: ''
         required: false
         type: string
+      assemble:
+        description: 'Enable running assemble'
+        default: false
+        required: false
+        type: boolean
+      gradle-args-assemble:
+        description: 'Gradle args for `Assemble` step'
+        default: ''
+        required: false
+        type: string
       build:
         description: 'Enable running build'
         default: true
         required: false
         type: boolean
       gradle-args-build:
-        description: 'Gradle args for `All tests` step'
+        description: 'Gradle args for `Build` step'
         default: ''
         required: false
         type: string
@@ -143,6 +153,10 @@ jobs:
         if: matrix.os == 'macos-latest'
         with:
           xcode-version: '13.4.1'
+
+      - name: Assemble
+        if: ${{ inputs.assemble == 'true' || inputs.assemble == true }}
+        run: ./gradlew assemble ${{ inputs.gradle-args-assemble }} ${{ inputs.gradle-args }}
 
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
