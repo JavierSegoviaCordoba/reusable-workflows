@@ -72,6 +72,16 @@ on:
         default: true
         required: false
         type: boolean
+      gradle-args-publish-dev:
+        description: 'Gradle args for `Publish dev` step'
+        default: ''
+        required: false
+        type: string
+      publish-dev:
+        description: 'Publish dev artifacts to Sonatype Maven Central repository'
+        default: false
+        required: false
+        type: boolean
       gradle-args-sonar:
         description: 'Gradle args for `Update Sonar` step'
         default: ''
@@ -213,10 +223,10 @@ jobs:
           cache-default-branch-only: true
           upload-result: false
 
-  publish-snapshot:
+  publish-dev-snapshot:
     if: |
       !cancelled() && !failure() &&
-      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-snapshot == true))
+      (((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.publish-snapshot == true || inputs.publish-dev == true))
 
     needs: [ build ]
 
@@ -260,11 +270,16 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
+      - name: Publish dev
+        if: ${{ inputs.publish-dev == 'true' || inputs.publish-dev == true }}
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-dev }} ${{ inputs.gradle-args }} -Psemver.stage=dev -Psemver.scope=patch
+
       - name: Publish snapshot
+        if: ${{ inputs.publish-snapshot == 'true' || inputs.publish-snapshot == true }}
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
 
       - name: Publish snapshot with custom tag prefix
-        if: ${{ inputs.publish-snapshot-tag-prefix != 'null' }}
+        if: ${{ (inputs.publish-snapshot == 'true' || inputs.publish-snapshot == true) && inputs.publish-snapshot-tag-prefix != 'null' }}
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot -Psemver.tagPrefix=${{ inputs.publish-snapshot-tag-prefix }}
 
   deploy-docs:
