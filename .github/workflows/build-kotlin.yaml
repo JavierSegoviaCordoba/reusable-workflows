@@ -81,7 +81,7 @@ on:
         description: 'Deploy docs to GitHub pages'
         default: true
         required: false
-        type: boolean
+        type: string
       publish-all-docs:
         description: 'Publish all docs to GitHub pages'
         default: false
@@ -268,7 +268,7 @@ jobs:
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot -Psemver.tagPrefix=${{ inputs.publish-snapshot-tag-prefix }}
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true)
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
 
     needs: [ code-quality-check, publish-snapshot ]
 
