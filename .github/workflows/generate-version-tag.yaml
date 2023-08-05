@@ -7,6 +7,11 @@ concurrency:
 on:
   workflow_call:
     inputs:
+      gradle-args:
+        description: 'Gradle args for every steps'
+        default: ''
+        required: false
+        type: string
       stage:
         description: 'Stage [alpha, beta, rc, final, auto]'
         default: 'auto'
@@ -101,7 +106,7 @@ jobs:
 
       - name: Set project versions as outputs
         id: semver-outputs
-        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false --no-scan
+        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput ${{ inputs.gradle-args }} -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false --no-scan
 
       - name: Set PUBLISH_VERSION output
         shell: kotlin -howtorun .main.kts {0}
@@ -127,7 +132,7 @@ jobs:
           githubOutputFile.putVariable("PUBLISH_VERSION", version)
 
 #      - name: Build
-#        run: ./gradlew build -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
+#        run: ./gradlew build ${{ inputs.gradle-args }} -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Upload reports
         if: ${{ failure() }}
@@ -137,7 +142,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Patch Changelog and regenerate README badges
-        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
+        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges ${{ inputs.gradle-args }} -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false
 
       - name: Commit
         run: |
@@ -148,7 +153,7 @@ jobs:
           git commit -m "Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}" -a
 
       - name: Generate Tag
-        run: ./gradlew createSemverTag -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
+        run: ./gradlew createSemverTag ${{ inputs.gradle-args }} -Psemver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }}
 
       - name: Push
         run: git push --follow-tags
