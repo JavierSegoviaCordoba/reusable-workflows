@@ -201,14 +201,14 @@ jobs:
 
       - name: Code quality with Qodana Cloud
         if: ${{ startsWith(env.QODANA_TOKEN, 'ey') }}
-        uses: JetBrains/qodana-action@v2023.2.1
+        uses: JetBrains/qodana-action@32c3156f63f31a54dece4ce3e32dbb767c38bb61 # v2023.2.6
         with:
           cache-default-branch-only: true
           upload-result: false
 
       - name: Code quality
         if: ${{ !startsWith(env.QODANA_TOKEN, 'ey') }}
-        uses: JetBrains/qodana-action@v2023.2.1
+        uses: JetBrains/qodana-action@32c3156f63f31a54dece4ce3e32dbb767c38bb61 # v2023.2.6
         with:
           cache-default-branch-only: true
           upload-result: false
