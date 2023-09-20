@@ -95,7 +95,7 @@ on:
     secrets:
       ANALYSIS_QODANA_TOKEN:
         required: false
-      ANALYSIS_SONAR_LOGIN:
+      ANALYSIS_SONAR_TOKEN:
         required: false
       NEXUS_STAGING_PROFILE_ID:
         required: false
@@ -105,7 +105,7 @@ on:
         required: false
 
 env:
-  ANALYSIS_SONAR_LOGIN: ${{ secrets.ANALYSIS_SONAR_LOGIN }}
+  ANALYSIS_SONAR_TOKEN: ${{ secrets.ANALYSIS_SONAR_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
   QODANA_TOKEN: ${{ secrets.ANALYSIS_QODANA_TOKEN }}
 
