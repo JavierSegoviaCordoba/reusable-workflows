@@ -62,6 +62,11 @@ on:
         default: ''
         required: false
         type: string
+      run-sonar-linux:
+        description: 'Run Sonar task'
+        default: false
+        required: false
+        type: boolean
       gradle-args-sonar:
         description: 'Gradle args for `Update Sonar` step'
         default: ''
@@ -210,7 +215,7 @@ jobs:
           path: 'build/reports'
 
       - name: Update Sonar
-        if: matrix.os == 'ubuntu-latest'
+        if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar "-Psemver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }}" ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
 
   code-quality-check:

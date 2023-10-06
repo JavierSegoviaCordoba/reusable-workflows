@@ -72,6 +72,11 @@ on:
         default: true
         required: false
         type: boolean
+      run-sonar-linux:
+        description: 'Run Sonar task'
+        default: false
+        required: false
+        type: boolean
       gradle-args-sonar:
         description: 'Gradle args for `Update Sonar` step'
         default: ''
@@ -170,7 +175,7 @@ jobs:
           path: '**/build/reports/allTests'
 
       - name: Update Sonar
-        if: matrix.os == 'ubuntu-latest'
+        if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
 
   code-quality-check:
