@@ -266,11 +266,11 @@ jobs:
           xcode-version: '13.4.1'
 
       - name: Publish snapshot
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot
 
       - name: Publish snapshot with custom tag prefix
         if: ${{ inputs.publish-snapshot-tag-prefix != 'null' }}
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot -Psemver.tagPrefix=${{ inputs.publish-snapshot-tag-prefix }}
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot -P semver.tagPrefix=${{ inputs.publish-snapshot-tag-prefix }}
 
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
@@ -313,10 +313,10 @@ jobs:
 
       - name: Set semver as output
         id: semver
-        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -Psemver.stage=snapshot --no-scan
+        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -P semver.stage=snapshot --no-scan
 
       - name: Generate docs
-        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -Psemver.stage=snapshot --no-scan
+        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-scan
 
       - name: Deploy all docs to GitHub Pages
         if: (inputs.publish-all-docs == 'true')

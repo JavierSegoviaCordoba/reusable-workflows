@@ -52,18 +52,18 @@ jobs:
 
       - name: Set Itself version output
         id: semver
-        run: ./gradlew printSemver -Psemver.stage=snapshot --githubOnlyRoot --githubOutput --no-scan
+        run: ./gradlew printSemver -P semver.stage=snapshot --githubOnlyRoot --githubOutput --no-scan
 
       - name: Publish next version to MavenLocal
-        run: ./gradlew publishToMavenLocal -Psemver.stage=snapshot
+        run: ./gradlew publishToMavenLocal -P semver.stage=snapshot
 
       - name: Check format
         continue-on-error: true
         run: |
           itselfVersion=${{ steps.semver.outputs.semver }}
-          ./gradlew checkFormat -PitselfVersion=$itselfVersion -Psemver.stage=beta
+          ./gradlew checkFormat -P itselfVersion=$itselfVersion -P semver.stage=beta
 
       - name: Build
         run: |
           itselfVersion=${{ steps.semver.outputs.semver }}
-          ./gradlew build -PitselfVersion=$itselfVersion -Psemver.stage=beta -x checkFormat -x spotlessCheck -x spotlessKotlinCheck
+          ./gradlew build -P itselfVersion=$itselfVersion -P semver.stage=beta -x checkFormat -x spotlessCheck -x spotlessKotlinCheck

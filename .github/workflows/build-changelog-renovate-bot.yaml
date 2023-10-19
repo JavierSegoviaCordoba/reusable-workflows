@@ -72,7 +72,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
-        run: ./gradlew addChangelogItem --renovateCommitTable -Psemver.tagPrefix=${{ inputs.tag-prefix }} ${{ inputs.gradle-args }}
+        run: ./gradlew addChangelogItem --renovateCommitTable -P semver.tagPrefix=${{ inputs.tag-prefix }} ${{ inputs.gradle-args }}
 
       - name: Commit and push
         run: |
