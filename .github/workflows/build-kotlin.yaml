@@ -159,6 +159,12 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        if: matrix.os == 'macos-latest'
+        with:
+          python-version: '3.10'
+
       - name: Assemble
         if: ${{ inputs.assemble == 'true' || inputs.assemble == true }}
         run: ./gradlew assemble ${{ inputs.gradle-args-assemble }} ${{ inputs.gradle-args }}

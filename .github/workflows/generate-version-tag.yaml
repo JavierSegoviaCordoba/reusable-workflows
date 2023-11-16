@@ -104,6 +104,12 @@ jobs:
         with:
           xcode-version: '13.4.1'
 
+      - name: Setup Python
+        uses: actions/setup-python@v4
+        if: matrix.os == 'macos-latest'
+        with:
+          python-version: '3.10'
+
       - name: Set project versions as outputs
         id: semver-outputs
         run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false --no-scan
