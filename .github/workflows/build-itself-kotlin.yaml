@@ -52,7 +52,7 @@ jobs:
           python-version: '3.10'
 
       - name: Setup Gradle
-        uses: gradle/gradle-build-action@v2.9.0
+        uses: gradle/gradle-build-action@v2.10.0
         with:
           gradle-home-cache-cleanup: true
 
