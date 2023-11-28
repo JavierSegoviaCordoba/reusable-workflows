@@ -326,7 +326,7 @@ jobs:
 
       - name: Deploy all docs to GitHub Pages
         if: (inputs.publish-all-docs == 'true')
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site'
@@ -339,7 +339,7 @@ jobs:
 
       - name: Deploy only API docs and reports to GitHub Pages
         if: (inputs.publish-all-docs == 'false')
-        uses: JamesIves/github-pages-deploy-action@v4.4.3
+        uses: JamesIves/github-pages-deploy-action@v4.5.0
         with:
           branch: 'gh-pages'
           folder: 'build/docs/_site/api/snapshot/'
