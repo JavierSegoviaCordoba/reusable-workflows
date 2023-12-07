@@ -127,12 +127,14 @@ jobs:
               writeText(lines.joinToString("\n"))
           }
           val outputs = """${{ toJSON(steps.semver-outputs.outputs) }}"""
-          val version =
+          val version: String =
               outputs
                   .lines()
-                  .first { it.contains("${{ inputs.semver-output-field }}") }
+                  .first { it.contains("SEMVER") }
+                  .substringAfterLast(':')
+                  .filterNot(Char::isWhitespace)
                   .substringBeforeLast('"')
-                  .substringAfterLast('"')
+                  .substringAfter('"')
           println(version)
           val githubOutputFile = File(System.getenv("GITHUB_OUTPUT"))
           githubOutputFile.putVariable("PUBLISH_VERSION", version)
