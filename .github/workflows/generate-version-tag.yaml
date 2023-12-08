@@ -72,43 +72,32 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
         with:
-          fetch-depth: 0
           token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
-      - name: Restore Kotlin native cache
-        if: ${{ inputs.restore-kotlin-native-cache == 'true' || inputs.restore-kotlin-native-cache == true }}
-        uses: actions/cache@704facf57e6136b1bc63b828d79edcd491f0ee84 # v3.3.2
+      - name: Kotlin native cache
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
         with:
-          path: ~/.konan
-          key: ${{ runner.os }}-konan-${{ hashFiles('**/gradle/libs.versions.toml') }}
-          restore-keys: |
-            ${{ runner.os }}-konan-
+          cache-enabled: ${{ inputs.restore-kotlin-native-cache }}
 
       - name: Set up Java
-        uses: actions/setup-java@387ac29b308b003ca37ba93a6cab5eb57c8f5f93 # v4.0.0
-        with:
-          distribution: 'zulu'
-          java-version: 17
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-java@main
 
-      - name: Setup Gradle
-        uses: gradle/gradle-build-action@87a9a15658c426a54dd469d4fc7dc1a73ca9d4a6 # v2.10.0
+      - name: Set up Gradle
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
         with:
-          cache-disabled: ${{ inputs.gradle-cache == 'false' }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup == 'true' }}
+          cache-enabled: ${{ inputs.gradle-cache }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
-      # TODO: Fix watchOS simulator. Remove when Kotlin 1.8.0 is released
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1
-        with:
-          xcode-version: '13.4.1'
+      - name: Set up Xcode
+        # TODO: Fix watchOS simulator. Disable if not necessary.
+        # if: 'false'
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
-      - name: Setup Python
-        uses: actions/setup-python@0a5c61591373683505ea898e09a3ea4f39ef2b9c # v5
+      - name: Set up Python
         if: matrix.os == 'macos-latest'
-        with:
-          python-version: '3.10'
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Set project versions as outputs
         id: semver-outputs
@@ -139,12 +128,12 @@ jobs:
           val githubOutputFile = File(System.getenv("GITHUB_OUTPUT"))
           githubOutputFile.putVariable("PUBLISH_VERSION", version)
 
-#      - name: Build
-#        run: ./gradlew build ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }}
+      # - name: Build
+      #   run: ./gradlew build ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }}
 
       - name: Upload reports
         if: ${{ failure() }}
-        uses: actions/upload-artifact@a8a3f3ad30e3422c9c7b888a15615d19a852ae32 # v3.1.3
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/upload-artifact@main
         with:
           name: 'reports-${{ matrix.os }}'
           path: '**/build/reports/**'
@@ -153,12 +142,9 @@ jobs:
         run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }} -P semver.checkClean=false
 
       - name: Commit
-        run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
-          git diff
-          git add .
-          git commit -m "Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}" -a
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/commit@main
+        with:
+          commit-message: 'Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}'
 
       - name: Generate Tag
         run: ./gradlew createSemverTag ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }}

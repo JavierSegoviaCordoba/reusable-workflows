@@ -1,0 +1,46 @@
+name: 'GitHub Pages Deploy'
+
+description: 'Action for deploying GitHub Pages'
+
+inputs:
+  branch:
+    description: 'Branch to deploy to'
+    required: true
+    default: 'gh-pages'
+  target-folder:
+    description: 'Target folder'
+    required: true
+    default: ''
+  folder:
+    description: 'Folder'
+    required: true
+  single-commit:
+    description: 'Whether to use a single commit'
+    required: true
+    default: 'false'
+  commit-message:
+    description: 'Commit message'
+    required: false
+  clean:
+    description: 'Whether to clean the branch before deploying'
+    required: true
+    default: 'true'
+  clean-exclude:
+    description: 'Files to exclude from cleaning'
+    required: true
+    default: ''
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: GitHub Pages deploy
+      uses: JamesIves/github-pages-deploy-action@65b5dfd4f5bcd3a7403bbc2959c144256167464e # v4.5.0
+      with:
+        branch: ${{ inputs.branch }}
+        target-folder: ${{ inputs.target-folder }}
+        folder: ${{ inputs.folder }}
+        single-commit: ${{ inputs.single-commit }}
+        commit-message: ${{ inputs.commit-message }}
+        clean: ${{ inputs.clean }}
+        clean-exclude: ${{ inputs.clean-exclude }}

@@ -1,0 +1,23 @@
+name: 'Checkout'
+
+description: 'Action for checking out a repo'
+
+inputs:
+  fetch-depth:
+    description: 'Depth for fetching'
+    required: true
+    default: '0'
+  token:
+    description: 'GitHub personal authentication token'
+    required: true
+    default: ${{ github.token }}
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Checkout
+      uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
+      with:
+        fetch-depth: ${{ inputs.fetch-depth }}
+        token: ${{ inputs.token }}

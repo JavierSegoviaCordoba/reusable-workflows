@@ -1,0 +1,42 @@
+name: 'GitHub Release'
+
+description: 'Action to publish a GitHub release'
+
+inputs:
+  allow-empty-changelog:
+    description: 'Allow empty changelog'
+    required: true
+    default: 'true'
+  changelog-file:
+    description: 'Changelog file'
+    required: true
+    default: 'CHANGELOG.md'
+  draft-release:
+    description: 'Draft release'
+    required: true
+    default: 'false'
+  github-token:
+    description: 'GitHub token'
+    required: true
+    default: ${{ github.token }}
+  pre-release:
+    description: 'Pre-release'
+    required: true
+    default: 'false'
+  tag-prefix-regex:
+    description: 'Tag prefix regex'
+    required: false
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: GitHub Release
+      uses: anton-yurchenko/git-release@719adb5848240b361a0a4b400568722fb9ba8536 # v5.0.2
+      env:
+        ALLOW_EMPTY_CHANGELOG: '${{ inputs.allow-empty-changelog }}'
+        CHANGELOG_FILE: '${{ inputs.changelog-file }} }}'
+        DRAFT_RELEASE: '${{ inputs.draft-release }}'
+        GITHUB_TOKEN: '${{ inputs.github-token }}'
+        PRE_RELEASE: '${{ inputs.pre-release }}'
+        TAG_PREFIX_REGEX: '${{ inputs.tag-prefix-regex }}'

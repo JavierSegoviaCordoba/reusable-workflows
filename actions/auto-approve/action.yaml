@@ -1,0 +1,26 @@
+name: 'Auto Approve'
+
+description: 'Action to auto approve a pull request'
+
+inputs:
+  github-token:
+    description: 'GitHub token'
+    required: true
+  pull-request-number:
+    description: 'Pull request number'
+    required: true
+  review-message:
+    description: 'Review message'
+    required: true
+    default: 'Auto approved'
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Auto Approve
+      uses: hmarr/auto-approve-action@44888193675f29a83e04faf4002fa8c0b537b1e4 # v3.2.1
+      with:
+        github-token: ${{ inputs.github-token }}
+        pull-request-number: ${{ inputs.pull-request-number }}
+        review-message: ${{ inputs.review-message }}

@@ -1,0 +1,17 @@
+name: 'Amend commit and push'
+
+description: 'Amend commit and push'
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Amend commit and push
+      shell: bash
+      run: |
+        git config --global user.email "action@github.com"
+        git config --global user.name "GitHub Action"
+        git diff
+        git add .
+        git commit --amend --no-edit
+        git push --force

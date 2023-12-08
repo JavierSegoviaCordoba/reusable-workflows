@@ -1,0 +1,17 @@
+name: 'Upload SARIF'
+
+description: 'Upload SARIF file'
+
+inputs:
+  sarif_file:
+    description: 'Path to SARIF file'
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Upload SARIF
+      uses: github/codeql-action/upload-sarif@c0d1daa7f7e14667747d73a7dbbe8c074bc8bfe2 # v2
+      with:
+        sarif_file: ${{ inputs.sarif_file }}

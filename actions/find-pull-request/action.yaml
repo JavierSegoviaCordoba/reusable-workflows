@@ -1,0 +1,18 @@
+name: 'Find Pull Request'
+
+description: 'Action to find a pull request'
+
+inputs:
+  branch:
+    description: 'Branch name'
+    required: true
+
+runs:
+  using: "composite"
+
+  steps:
+    - name: Find Pull Request
+      id: find-pull-request
+      uses: juliangruber/find-pull-request-action@3a4c7c62101755c3778d397dcb6a760a558992f1 # v1.8.0
+      with:
+        branch: ${{ inputs.branch }}
