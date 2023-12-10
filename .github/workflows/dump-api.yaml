@@ -33,9 +33,8 @@ jobs:
           token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
       - name: Kotlin native cache
+        if: inputs.restore-kotlin-native-cache == true
         uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
-        with:
-          cache-enabled: ${{ inputs.restore-kotlin-native-cache }}
 
       - name: Set up Java
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-java@main
