@@ -27,7 +27,7 @@ runs:
       run: echo "Qodana is running only locally"
 
     - name: Code quality with Qodana Cloud
-      uses: JetBrains/qodana-action@489ba717a0b11fe2257c4a1713e5fdaf94eeab55 # v2023.2.9
+      uses: JetBrains/qodana-action@a8363b702c2d2d49a77620bcd10541686df21307 # v2023.3.0
       with:
         cache-default-branch-only: ${{ inputs.cache-default-branch-only == 'true' || inputs.cache-default-branch-only == true }}
         upload-result: ${{ inputs.upload-result == 'true' || inputs.upload-result == true }}
