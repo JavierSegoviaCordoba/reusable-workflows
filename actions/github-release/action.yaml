@@ -35,7 +35,7 @@ runs:
       uses: anton-yurchenko/git-release@719adb5848240b361a0a4b400568722fb9ba8536 # v5.0.2
       env:
         ALLOW_EMPTY_CHANGELOG: '${{ inputs.allow-empty-changelog }}'
-        CHANGELOG_FILE: '${{ inputs.changelog-file }} }}'
+        CHANGELOG_FILE: '${{ inputs.changelog-file }}'
         DRAFT_RELEASE: '${{ inputs.draft-release }}'
         GITHUB_TOKEN: '${{ inputs.github-token }}'
         PRE_RELEASE: '${{ inputs.pre-release }}'
