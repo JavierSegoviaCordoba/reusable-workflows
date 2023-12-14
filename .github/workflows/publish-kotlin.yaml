@@ -97,9 +97,8 @@ on:
         default: 'CHANGELOG.md'
         required: false
         type: string
-      changelog-file-c-tag-prefix:
-        description: 'Changelog file path for c tag prefix'
-        default: 'CHANGELOG.md'
+      tag-prefix-regex:
+        description: 'Tag prefix regex for GitHub release'
         required: false
         type: string
     secrets:
@@ -336,22 +335,4 @@ jobs:
           changelog-file: '${{ inputs.changelog-file }}'
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           pre-release: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-
-  github-release-catalog:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (needs.tag-prefix.outputs.tag-prefix == 'c')
-
-    needs: [ tag-prefix, publish ]
-
-    runs-on: 'ubuntu-latest'
-
-    steps:
-      - name: Checkout
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
-
-      - name: Publish GitHub Release
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/github-release@main
-        env:
-          changelog-file: '${{ inputs.changelog-file-c-tag-prefix }}'
-          github-token: '${{ secrets.GITHUB_TOKEN }}'
-          pre-release: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          tag-prefix-regex: '[c]?'
+          tag-prefix-regex: '${{ inputs.tag-prefix-regex }}'
