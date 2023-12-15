@@ -1,0 +1,52 @@
+name: fix-checks
+
+on:
+  workflow_call:
+    inputs:
+      restore-kotlin-native-cache:
+        description: 'Restore Kotlin cache, `~/.konan` directory'
+        default: true
+        required: false
+        type: boolean
+      gradle-cache:
+        description: 'Use Gradle cache'
+        default: true
+        required: false
+        type: string
+      gradle-cache-cleanup:
+        description: 'Enable removing unnecessary Gradle home cache'
+        default: true
+        required: false
+        type: string
+    secrets:
+      TOKEN_GITHUB_ACTION:
+        required: true
+
+jobs:
+  fix-checks:
+    runs-on: 'ubuntu-latest'
+
+    steps:
+      - name: Checkout
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
+        with:
+          token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
+
+      - name: Kotlin native cache
+        if: inputs.restore-kotlin-native-cache == true
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
+
+      - name: Set up Java
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-java@main
+
+      - name: Set up Gradle
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
+        with:
+          cache-enabled: ${{ inputs.gradle-cache }}
+          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
+
+      - name: Fix checks
+        run: ./gradlew fixChecks
+
+      - name: Amend commit and push
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/amend-commit-and-push@main
