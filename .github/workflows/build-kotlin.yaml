@@ -161,13 +161,13 @@ jobs:
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
 
-      - name: Upload all tests report
+      - name: Upload test reports
         if: ${{ failure() }}
         continue-on-error: true
         uses: JavierSegoviaCordoba/reusable-workflows/actions/upload-artifact@main
         with:
-          name: 'report-all-tests-${{ matrix.os }}'
-          path: '**/build/reports/allTests'
+          name: 'test-reports-${{ matrix.os }}'
+          path: '**/build/reports/tests'
 
       - name: Update Sonar
         if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
