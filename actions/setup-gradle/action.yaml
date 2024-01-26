@@ -17,7 +17,7 @@ runs:
 
   steps:
     - name: Setup Gradle
-      uses: gradle/actions/setup-gradle@v3
+      uses: gradle/actions/setup-gradle@b6816cf21e7970b88479bb3c57d9cbe5cdd4b949 # v3
       with:
         cache-disabled: ${{ inputs.cache-enabled == 'false' || inputs.cache-enabled == false }}
         gradle-home-cache-cleanup: ${{ inputs.gradle-home-cache-cleanup == 'true' || inputs.gradle-home-cache-cleanup == true }}
