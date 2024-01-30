@@ -14,6 +14,6 @@ runs:
   steps:
     - name: Set up Xcode
       uses: maxim-lobanov/setup-xcode@60606e260d2fc5762a71e64e74b2174e8ea3c8bd # v1
-      if: matrix.os == 'macos-latest'
+      if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
       with:
         xcode-version: ${{ inputs.xcode-version }}
