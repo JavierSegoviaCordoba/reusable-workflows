@@ -167,7 +167,7 @@ jobs:
 
     strategy:
       matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest', 'macos-14' ]
+        os: [ 'macos-14', 'ubuntu-latest', 'windows-latest' ]
 
     steps:
       - name: Checkout
@@ -192,7 +192,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Set up Python
-        if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
+        if: startsWith(matrix.os, 'macos-14')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Build
@@ -230,7 +230,7 @@ jobs:
 
     needs: [ tag-prefix, build ]
 
-    runs-on: 'macos-latest'
+    runs-on: 'macos-14'
 
     env:
       GRADLE_PUBLISH_KEY: '${{ secrets.GRADLE_PUBLISH_KEY }}'
@@ -266,7 +266,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Set up Python
-        if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
+        if: startsWith(matrix.os, 'macos-14')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Publish to MavenCentral

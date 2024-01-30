@@ -123,7 +123,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest', 'macos-14' ]
+        os: [ 'ubuntu-latest', 'windows-latest', 'macos-14' ]
 
     steps:
       - name: Checkout
@@ -151,7 +151,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Set up Python
-        if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
+        if: startsWith(matrix.os, 'macos-14')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Assemble
@@ -196,7 +196,7 @@ jobs:
 
     needs: [ build ]
 
-    runs-on: 'macos-latest'
+    runs-on: 'macos-14'
 
     env:
       NEXUS_USER: '${{ secrets.NEXUS_USER }}'

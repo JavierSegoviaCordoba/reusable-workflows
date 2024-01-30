@@ -22,7 +22,7 @@ jobs:
     strategy:
       fail-fast: false
       matrix:
-        os: [ 'macos-14', 'macos-latest', 'ubuntu-latest' ]
+        os: [ 'macos-14', 'ubuntu-latest' ]
 
     steps:
       - name: Checkout
@@ -50,7 +50,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Set up Python
-        if: matrix.os == 'macos-latest' || matrix.os == 'macos-14'
+        if: startsWith(matrix.os, 'macos-')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Set Itself version output
