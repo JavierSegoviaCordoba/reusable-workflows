@@ -6,7 +6,7 @@ inputs:
   xcode-version:
     description: 'Xcode version'
     required: true
-    default: '13.4.1'
+    default: 'latest-stable'
 
 runs:
   using: "composite"
