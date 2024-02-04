@@ -290,7 +290,7 @@ jobs:
         run: ./gradlew publishPlugin -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }}
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'dev') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
 
     needs: [ code-quality-check, tag-prefix, publish ]
 
@@ -342,5 +342,5 @@ jobs:
         with:
           changelog-file: '${{ inputs.changelog-file }}'
           github-token: '${{ secrets.GITHUB_TOKEN }}'
-          pre-release: ${{ contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
+          pre-release: ${{ contains(github.ref, 'dev') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
           tag-prefix-regex: '${{ inputs.tag-prefix-regex }}'

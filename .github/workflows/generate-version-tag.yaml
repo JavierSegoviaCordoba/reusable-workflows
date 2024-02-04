@@ -13,7 +13,7 @@ on:
         required: false
         type: string
       stage:
-        description: 'Stage [alpha, beta, rc, final, auto]'
+        description: 'Stage [dev, alpha, beta, rc, final, auto]'
         default: 'auto'
         required: true
         type: string
