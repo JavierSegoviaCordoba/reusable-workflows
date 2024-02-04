@@ -42,6 +42,11 @@ on:
         default: ''
         required: false
         type: string
+      run_before_args:
+        description: 'Gradle args for `Run before` step'
+        default: ''
+        required: false
+        type: string
       gradle-args-build:
         description: 'Gradle args for `build` step'
         default: ''
@@ -194,6 +199,9 @@ jobs:
       - name: Set up Python
         if: startsWith(matrix.os, 'macos-14')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
+
+      - name: Run before
+        run: ${{ inputs.run_before_args }}
 
       - name: Build
         run: ./gradlew build -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }}

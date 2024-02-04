@@ -37,8 +37,8 @@ on:
         default: false
         required: false
         type: boolean
-      gradle-args-assemble:
-        description: 'Gradle args for `Assemble` step'
+      run_before_args:
+        description: 'Gradle args for `Run before` step'
         default: ''
         required: false
         type: string
@@ -154,9 +154,8 @@ jobs:
         if: startsWith(matrix.os, 'macos-14')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
-      - name: Assemble
-        if: ${{ inputs.assemble == 'true' || inputs.assemble == true }}
-        run: ./gradlew assemble ${{ inputs.gradle-args-assemble }} ${{ inputs.gradle-args }}
+      - name: Run before
+        run: ${{ inputs.run_before_args }}
 
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
