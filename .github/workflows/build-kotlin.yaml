@@ -72,6 +72,11 @@ on:
         default: true
         required: false
         type: boolean
+      gradle-args-publish-snapshot-tag-prefix-two:
+        description: 'Gradle args for `Publish snapshot with tag prefix 2` step'
+        default: 'null'
+        required: false
+        type: string
       run-sonar-linux:
         description: 'Run Sonar task'
         default: false
@@ -90,11 +95,6 @@ on:
       publish-all-docs:
         description: 'Publish all docs to GitHub pages'
         default: false
-        required: false
-        type: string
-      publish-snapshot-tag-prefix:
-        description: 'Publish snapshot based on a custom tag prefix'
-        default: 'null'
         required: false
         type: string
     secrets:
@@ -227,9 +227,9 @@ jobs:
       - name: Publish snapshot
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot
 
-      - name: Publish snapshot with custom tag prefix
-        if: ${{ inputs.publish-snapshot-tag-prefix != 'null' }}
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot -P semver.tagPrefix=${{ inputs.publish-snapshot-tag-prefix }}
+      - name: Publish snapshot with tag prefix 2
+        if: ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two != 'null' }}
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot
 
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
