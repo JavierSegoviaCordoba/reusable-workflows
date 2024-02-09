@@ -6,6 +6,10 @@ inputs:
   commit-message:
     description: 'Commit message'
     required: true
+  push:
+    description: 'Push changes'
+    required: false
+    default: 'false'
 
 runs:
   using: "composite"
@@ -19,3 +23,8 @@ runs:
         git diff
         git add .
         git commit -m "${{ inputs.commit-message }}" -a
+
+    - name: Push
+      if: ${{ inputs.push == 'true' }}
+      shell: bash
+      run: git push
