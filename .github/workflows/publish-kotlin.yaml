@@ -102,10 +102,6 @@ on:
         default: 'CHANGELOG.md'
         required: false
         type: string
-      tag-prefix-regex:
-        description: 'Tag prefix regex for GitHub release'
-        required: false
-        type: string
     secrets:
       ANALYSIS_QODANA_TOKEN:
         required: false
@@ -343,4 +339,4 @@ jobs:
           changelog-file: '${{ inputs.changelog-file }}'
           github-token: '${{ secrets.GITHUB_TOKEN }}'
           pre-release: ${{ contains(github.ref, 'dev') || contains(github.ref, 'alpha') || contains(github.ref, 'beta') || contains(github.ref, 'rc') }}
-          tag-prefix-regex: '${{ inputs.tag-prefix-regex }}'
+          tag-prefix-regex: '*'
