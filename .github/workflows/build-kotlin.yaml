@@ -32,14 +32,9 @@ on:
         default: ''
         required: false
         type: string
-      assemble:
-        description: 'Enable running assemble'
-        default: false
-        required: false
-        type: boolean
       run_before_args:
         description: 'Gradle args for `Run before` step'
-        default: ''
+        default: 'null'
         required: false
         type: string
       build:
@@ -155,6 +150,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Run before
+        if: ${{ inputs.run_before_args != 'null' }}
         run: ${{ inputs.run_before_args }}
 
       - name: Build
