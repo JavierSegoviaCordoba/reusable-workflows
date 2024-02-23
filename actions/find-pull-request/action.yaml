@@ -18,6 +18,6 @@ runs:
   steps:
     - name: Find Pull Request
       id: find-pull-request
-      uses: juliangruber/find-pull-request-action@3a4c7c62101755c3778d397dcb6a760a558992f1 # v1.8.0
+      uses: juliangruber/find-pull-request-action@51c53b26c62091a3b00109116b4f239bb65dba87 # v1.8.1
       with:
         branch: ${{ inputs.branch }}
