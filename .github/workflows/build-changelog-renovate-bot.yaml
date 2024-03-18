@@ -8,6 +8,11 @@ on:
         default: true
         required: false
         type: boolean
+      renovate-branch:
+        description: 'Renovate branch'
+        default: 'renovate/hubdle'
+        required: false
+        type: string
       restore-kotlin-native-cache:
         description: 'Restore Kotlin cache, `~/.konan` directory'
         default: true
@@ -73,7 +78,7 @@ jobs:
         id: find-pull-request
         uses: JavierSegoviaCordoba/reusable-workflows/actions/find-pull-request@main
         with:
-          branch: 'renovate/hubdle'
+          branch: ${{ inputs.renovate-branch }}
 
       - name: Auto Approve
         if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) }}
