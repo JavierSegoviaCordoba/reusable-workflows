@@ -69,7 +69,7 @@ on:
         type: string
       run-sonar-linux:
         description: 'Run Sonar task'
-        default: false
+        default: true
         required: false
         type: boolean
       gradle-args-sonar:
