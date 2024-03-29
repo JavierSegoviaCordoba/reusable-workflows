@@ -323,7 +323,7 @@ jobs:
             reports-generated/**
 
   github-release:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true) && (needs.tag-prefix.outputs.tag-prefix != null) && (needs.tag-prefix.outputs.tag-prefix != 'null')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true)
 
     needs: [ tag-prefix, publish ]
 
