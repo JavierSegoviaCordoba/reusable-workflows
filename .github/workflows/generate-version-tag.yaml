@@ -68,7 +68,7 @@ jobs:
   generate-version-tag:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
 
-    runs-on: 'macos-14'
+    runs-on: 'macos-latest'
 
     steps:
       - name: Checkout
@@ -95,7 +95,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Set up Python
-        if: startsWith(matrix.os, 'macos-14')
+        if: startsWith(matrix.os, 'macos-latest')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
 
       - name: Set project versions as outputs
