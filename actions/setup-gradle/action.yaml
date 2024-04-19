@@ -21,3 +21,4 @@ runs:
       with:
         cache-disabled: ${{ inputs.cache-enabled == 'false' || inputs.cache-enabled == false }}
         gradle-home-cache-cleanup: ${{ inputs.gradle-home-cache-cleanup == 'true' || inputs.gradle-home-cache-cleanup == true }}
+        validate-wrappers: true

@@ -127,9 +127,6 @@ jobs:
       - name: Checkout
         uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
 
-      - name: Validate Gradle wrapper
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/gradle-wrapper-validation@main
-
       - name: Kotlin native cache
         if: inputs.restore-kotlin-native-cache == true
         uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
