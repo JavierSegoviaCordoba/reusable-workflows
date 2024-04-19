@@ -45,6 +45,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
         with:
           cache-enabled: true
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           gradle-home-cache-cleanup: true
 
       - name: Set up Xcode

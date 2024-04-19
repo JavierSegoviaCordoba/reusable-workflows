@@ -70,6 +70,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
+          cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate

@@ -7,6 +7,10 @@ inputs:
     description: 'Gradle cache'
     required: true
     default: 'true'
+  cache-encryption-key:
+    description: 'Cache encryption key'
+    required: true
+    default: ''
   gradle-home-cache-cleanup:
     description: 'Cleanup Gradle home cache'
     required: true
@@ -20,5 +24,6 @@ runs:
       uses: gradle/actions/setup-gradle@750cdda3edd6d51b7fdfc069d2e2818cf3c44f4c # v3
       with:
         cache-disabled: ${{ inputs.cache-enabled == 'false' || inputs.cache-enabled == false }}
+        cache-encryption-key: ${{ inputs.cache-encryption-key }}
         gradle-home-cache-cleanup: ${{ inputs.gradle-home-cache-cleanup == 'true' || inputs.gradle-home-cache-cleanup == true }}
         validate-wrappers: true
