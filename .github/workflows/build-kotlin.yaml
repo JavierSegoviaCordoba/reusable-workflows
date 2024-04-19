@@ -221,11 +221,11 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Publish snapshot
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache
 
       - name: Publish snapshot with tag prefix 2
         if: ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two != 'null' }}
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache
 
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
