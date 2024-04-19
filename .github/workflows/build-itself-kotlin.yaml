@@ -12,6 +12,12 @@ on:
         default: true
         required: false
         type: boolean
+    secrets:
+      GRADLE_ENCRYPTION_KEY:
+        required: false
+
+env:
+  GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
 jobs:
   build-itself:

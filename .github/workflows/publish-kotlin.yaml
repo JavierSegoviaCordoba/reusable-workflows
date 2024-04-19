@@ -107,6 +107,8 @@ on:
         required: false
       ANALYSIS_SONAR_TOKEN:
         required: false
+      GRADLE_ENCRYPTION_KEY:
+        required: false
       NEXUS_STAGING_PROFILE_ID:
         required: false
       NEXUS_TOKEN:
@@ -133,6 +135,7 @@ on:
 env:
   ANALYSIS_SONAR_TOKEN: ${{ secrets.ANALYSIS_SONAR_TOKEN }}
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+  GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
   QODANA_TOKEN: ${{ secrets.ANALYSIS_QODANA_TOKEN }}
   SIGNING_GNUPG_KEY: '${{ secrets.SIGNING_GNUPG_KEY }}'
   SIGNING_GNUPG_PASSPHRASE: '${{ secrets.SIGNING_GNUPG_PASSPHRASE }}'

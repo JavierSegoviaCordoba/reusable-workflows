@@ -19,8 +19,13 @@ on:
         required: false
         type: string
     secrets:
+      GRADLE_ENCRYPTION_KEY:
+        required: false
       TOKEN_GITHUB_ACTION:
         required: true
+
+env:
+  GRADLE_ENCRYPTION_KEY: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
 
 jobs:
   run-kotlin-upgrade-yarn-lock:
