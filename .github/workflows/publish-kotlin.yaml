@@ -94,7 +94,7 @@ on:
         type: string
       gradle-cache-cleanup:
         description: 'Enable removing unnecessary Gradle home cache'
-        default: true
+        default: 'on-success'
         required: false
         type: string
       changelog-file:
@@ -189,7 +189,7 @@ jobs:
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
+          cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Set up Xcode
         # TODO: Fix watchOS simulator. Disable if not necessary.
@@ -267,7 +267,7 @@ jobs:
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
+          cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Set up Xcode
         # TODO: Fix watchOS simulator. Disable if not necessary.
@@ -313,7 +313,7 @@ jobs:
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
+          cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Generate Site docs
         run: ./gradlew buildSite -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} --no-scan --no-configuration-cache

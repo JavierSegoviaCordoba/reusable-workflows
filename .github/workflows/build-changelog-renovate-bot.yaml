@@ -35,7 +35,7 @@ on:
         type: string
       gradle-cache-cleanup:
         description: 'Enable removing unnecessary Gradle home cache'
-        default: true
+        default: 'on-success'
         required: false
         type: string
     secrets:
@@ -71,7 +71,7 @@ jobs:
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
+          cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
         run: ./gradlew addChangelogItem --renovateCommitTable -P semver.tagPrefix=${{ inputs.tag-prefix }} ${{ inputs.gradle-args }}

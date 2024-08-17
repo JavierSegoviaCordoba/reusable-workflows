@@ -11,10 +11,10 @@ inputs:
     description: 'Cache encryption key'
     required: true
     default: ''
-  gradle-home-cache-cleanup:
+  cache-cleanup:
     description: 'Cleanup Gradle home cache'
     required: true
-    default: 'true'
+    default: 'on-success'
 
 runs:
   using: "composite"
@@ -25,5 +25,5 @@ runs:
       with:
         cache-disabled: ${{ inputs.cache-enabled == 'false' || inputs.cache-enabled == false }}
         cache-encryption-key: ${{ inputs.cache-encryption-key }}
-        gradle-home-cache-cleanup: ${{ inputs.gradle-home-cache-cleanup == 'true' || inputs.gradle-home-cache-cleanup == true }}
+        cache-cleanup: ${{ inputs.cache-cleanup }}
         validate-wrappers: true

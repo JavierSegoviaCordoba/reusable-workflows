@@ -46,7 +46,7 @@ jobs:
         with:
           cache-enabled: true
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
-          gradle-home-cache-cleanup: true
+          cache-cleanup: 'on-success'
 
       - name: Set up Xcode
         # TODO: Fix watchOS simulator. Disable if not necessary.
