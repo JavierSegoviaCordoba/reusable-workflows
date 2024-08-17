@@ -264,7 +264,7 @@ jobs:
         run: ./gradlew printSemver --githubOnlyRoot --githubOutput -P semver.stage=snapshot --no-scan
 
       - name: Generate docs
-        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-scan
+        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-scan --no-configuration-cache
 
       - name: Deploy all docs to GitHub Pages
         if: (inputs.publish-all-docs == 'true')

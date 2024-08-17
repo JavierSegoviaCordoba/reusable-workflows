@@ -280,7 +280,7 @@ jobs:
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }}
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }} --no-configuration-cache
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
@@ -316,7 +316,7 @@ jobs:
           gradle-home-cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Generate Site docs
-        run: ./gradlew buildSite -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} --no-scan
+        run: ./gradlew buildSite -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} --no-scan --no-configuration-cache
 
       - name: Deploy docs to GitHub Pages
         uses: JavierSegoviaCordoba/reusable-workflows/actions/github-pages-deploy@main
