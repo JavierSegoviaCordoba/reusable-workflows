@@ -165,6 +165,13 @@ jobs:
           name: 'test-reports-${{ matrix.os }}'
           path: '**/build/reports/tests'
 
+      - name: Upload configuration cache reports
+        continue-on-error: true
+        uses: JavierSegoviaCordoba/reusable-workflows/actions/upload-artifact@main
+        with:
+          name: 'configuration-cache-report-${{ matrix.os }}'
+          path: '**/build/reports/configuration-cache'
+
       - name: Update Sonar
         if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
