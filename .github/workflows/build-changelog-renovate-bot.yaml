@@ -59,6 +59,14 @@ jobs:
         with:
           token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
 
+      # TODO: Workaround for https://github.com/gradle/gradle/issues/30213?notification_referrer_id=NT_kwDOAHHijLMxMTk5Mjg4Mjg3Nzo3NDYzNTY0#issuecomment-2302398137
+      - name: Cache JGit
+        id: cache-jgit
+        uses: actions/cache@v4
+        with:
+          path: '~/.config/jgit/config'
+          key: ${{ runner.os }}-jgit
+
       - name: Kotlin native cache
         if: inputs.restore-kotlin-native-cache == true
         uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
