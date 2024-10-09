@@ -17,6 +17,11 @@ on:
         default: true
         required: false
         type: boolean
+      run_before_args:
+        description: 'Gradle args for `Run before` step'
+        default: 'null'
+        required: false
+        type: string
     secrets:
       GRADLE_ENCRYPTION_KEY:
         required: false
@@ -69,6 +74,10 @@ jobs:
       - name: Set up Python
         if: startsWith(matrix.os, 'macos-')
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
+
+      - name: Run before
+        if: ${{ inputs.run_before_args != 'null' }}
+        run: ${{ inputs.run_before_args }}
 
       - name: Set Itself version output
         id: semver
