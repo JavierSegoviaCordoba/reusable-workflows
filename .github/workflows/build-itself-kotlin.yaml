@@ -7,6 +7,11 @@ concurrency:
 on:
   workflow_call:
     inputs:
+      tag-prefix:
+        description: 'Tag prefix'
+        default: ''
+        required: false
+        type: string
       restore-kotlin-native-cache:
         description: 'Restore Kotlin cache, `~/.konan` directory'
         default: true
@@ -67,16 +72,16 @@ jobs:
 
       - name: Set Itself version output
         id: semver
-        run: ./gradlew printSemver -P semver.stage=snapshot --githubOnlyRoot --githubOutput --no-scan
+        run: ./gradlew printSemver -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=snapshot --githubOutput --no-scan
 
       - name: Publish next version to MavenLocal
-        run: ./gradlew publishToMavenLocal -P semver.stage=snapshot
+        run: ./gradlew publishToMavenLocal -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=snapshot --no-scan
 
       - name: Check format
         continue-on-error: true
         run: |
           itselfVersion=${{ steps.semver.outputs.semver }}
-          ./gradlew checkFormat -P itselfVersion=$itselfVersion -P semver.stage=beta
+          ./gradlew checkFormat -P itselfVersion=$itselfVersion -P semver.stage=beta --no-scan
 
       - name: Build
         run: |
