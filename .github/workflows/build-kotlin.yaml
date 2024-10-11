@@ -166,6 +166,12 @@ jobs:
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
 
+      - name: Publish test reports
+        uses: mikepenz/action-junit-report@v4.3.1
+        if: success() || failure()
+        with:
+          report_paths: '**/build/test-results/**/TEST-*.xml'
+
       - name: Upload test reports
         if: ${{ failure() }}
         continue-on-error: true
