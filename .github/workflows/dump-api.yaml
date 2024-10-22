@@ -40,7 +40,7 @@ jobs:
       # TODO: Workaround for https://github.com/gradle/gradle/issues/30213?notification_referrer_id=NT_kwDOAHHijLMxMTk5Mjg4Mjg3Nzo3NDYzNTY0#issuecomment-2302398137
       - name: Cache JGit
         id: cache-jgit
-        uses: actions/cache@3624ceb22c1c5a301c8db4169662070a689d9ea8 # v4
+        uses: actions/cache@6849a6489940f00c2f30c0fb92c6274307ccb58a # v4
         with:
           path: '~/.config/jgit/config'
           key: ${{ runner.os }}-jgit
