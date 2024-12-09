@@ -19,9 +19,9 @@ on:
         type: boolean
       gradle-cache:
         description: 'Use Gradle cache'
-        default: on-success
+        default: true
         required: false
-        type: string
+        type: boolean
       gradle-cache-cleanup:
         description: 'Enable removing unnecessary Gradle home cache'
         default: 'on-success'

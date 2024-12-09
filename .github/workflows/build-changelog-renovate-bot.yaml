@@ -30,9 +30,9 @@ on:
         type: string
       gradle-cache:
         description: 'Use Gradle cache'
-        default: ''
+        default: true
         required: false
-        type: string
+        type: boolean
       gradle-cache-cleanup:
         description: 'Enable removing unnecessary Gradle home cache'
         default: 'on-success'
