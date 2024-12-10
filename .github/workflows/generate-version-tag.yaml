@@ -69,7 +69,7 @@ env:
 
 jobs:
   generate-version-tag:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]')))
 
     runs-on: 'macos-latest'
 

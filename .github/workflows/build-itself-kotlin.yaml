@@ -31,7 +31,7 @@ env:
 
 jobs:
   build-itself:
-    if: (!contains(github.actor, '[bot]'))
+    if: (!contains(github.triggering_actor, '[bot]'))
 
     runs-on: ${{ matrix.os }}
 

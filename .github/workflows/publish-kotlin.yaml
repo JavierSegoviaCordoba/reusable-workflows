@@ -163,7 +163,7 @@ jobs:
           echo "Prefix: $prefix"
 
   build:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]')))
 
     needs: tag-prefix
 
@@ -232,7 +232,7 @@ jobs:
         run: ./gradlew sonar -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
 
   code-quality-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.code-quality-check == true)
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
 
     runs-on: ubuntu-latest
 
@@ -248,7 +248,7 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/qodana@main
 
   publish:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]')))
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]')))
 
     needs: [ tag-prefix, build ]
 
@@ -305,7 +305,7 @@ jobs:
         run: ./gradlew publishPlugin -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }}
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'dev') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'dev') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
 
     needs: [ code-quality-check, tag-prefix, publish ]
 
@@ -343,7 +343,7 @@ jobs:
             reports-generated/**
 
   github-release:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.actor, '[bot]'))) && (inputs.publish-github-release == true)
+    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.publish-github-release == true)
 
     needs: [ tag-prefix, publish ]
 
