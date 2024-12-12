@@ -114,7 +114,8 @@ env:
 
 jobs:
   build:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.build)
+    if: (inputs.build)
+    # if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.build)
 
     runs-on: ${{ matrix.os }}
 
@@ -192,7 +193,8 @@ jobs:
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
 
   code-quality-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
+    # if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
+    if: (inputs.code-quality-check == true)
 
     runs-on: ubuntu-latest
 
@@ -209,8 +211,9 @@ jobs:
 
   publish-snapshot:
     if: |
-      !cancelled() && !failure() &&
-      (((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && ((inputs.publish-snapshot == true) || (inputs.publish-snapshot == 'true')))
+      !cancelled() && !failure() && 
+        (((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && ((inputs.publish-snapshot == true) || (inputs.publish-snapshot == 'true')))
+    # (((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && ((inputs.publish-snapshot == true) || (inputs.publish-snapshot == 'true')))
 
     needs: [ build ]
 
@@ -252,7 +255,8 @@ jobs:
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
+    #    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
+    if: ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
 
     needs: [ code-quality-check, publish-snapshot ]
 
