@@ -60,7 +60,7 @@ jobs:
           cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Dump API
-        run: ./gradlew dumpApi
+        run: ./gradlew dumpApi -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Amend commit and push
         uses: JavierSegoviaCordoba/reusable-workflows/actions/amend-commit-and-push@main

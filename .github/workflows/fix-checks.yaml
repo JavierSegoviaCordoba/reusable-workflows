@@ -60,7 +60,7 @@ jobs:
           cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Fix checks
-        run: ./gradlew fixChecks
+        run: ./gradlew fixChecks -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Amend commit and push
         uses: JavierSegoviaCordoba/reusable-workflows/actions/amend-commit-and-push@main

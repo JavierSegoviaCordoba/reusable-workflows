@@ -82,7 +82,7 @@ jobs:
           cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Add updated dependencies to the CHANGELOG from Renovate
-        run: ./gradlew addChangelogItem --renovateCommitTable -P semver.tagPrefix=${{ inputs.tag-prefix }} ${{ inputs.gradle-args }}
+        run: ./gradlew addChangelogItem --renovateCommitTable -P semver.tagPrefix=${{ inputs.tag-prefix }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Amend commit and push
         uses: JavierSegoviaCordoba/reusable-workflows/actions/amend-commit-and-push@main

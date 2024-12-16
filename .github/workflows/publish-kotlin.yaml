@@ -212,7 +212,7 @@ jobs:
         run: ${{ inputs.run_before_args }}
 
       - name: Build
-        run: ./gradlew build -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }}
+        run: ./gradlew build -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish test reports
         uses: mikepenz/action-junit-report@62516aa379bff6370c95fd5894d5a27fb6619d9b # v5.2.0
@@ -229,7 +229,7 @@ jobs:
 
       - name: Update Sonar
         if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
-        run: ./gradlew sonar -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
+        run: ./gradlew sonar -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
@@ -294,15 +294,15 @@ jobs:
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
-        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }} --no-configuration-cache
+        run: ./gradlew publishToSonatype closeAndReleaseSonatypeStagingRepository -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }} --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
-        run: ./gradlew publishPlugins --no-parallel --no-configuration-cache -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }} ${{ inputs.gradle-args }}
+        run: ./gradlew publishPlugins --no-parallel --no-configuration-cache -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-gradle-plugin-portal }} -Pgradle.publish.key=${{ secrets.GRADLE_PUBLISH_KEY }} -Pgradle.publish.secret=${{ secrets.GRADLE_PUBLISH_SECRET }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish to JetBrains marketplace
         if: (inputs.publish-jetbrains-marketplace == true)
-        run: ./gradlew publishPlugin -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }}
+        run: ./gradlew publishPlugin -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-jetbrains-marketplace }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   deploy-docs:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.publish-docs == true) && !contains(github.ref, 'dev') && !contains(github.ref, 'alpha') && !contains(github.ref, 'beta') && !contains(github.ref, 'rc') && (needs.tag-prefix.outputs.tag-prefix == '')
@@ -330,7 +330,7 @@ jobs:
           cache-cleanup: ${{ inputs.gradle-cache-cleanup }}
 
       - name: Generate Site docs
-        run: ./gradlew buildSite -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} --no-scan --no-configuration-cache
+        run: ./gradlew buildSite -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} --no-scan --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Deploy docs to GitHub Pages
         uses: JavierSegoviaCordoba/reusable-workflows/actions/github-pages-deploy@main

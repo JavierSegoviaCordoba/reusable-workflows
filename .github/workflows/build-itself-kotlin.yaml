@@ -81,18 +81,18 @@ jobs:
 
       - name: Set Itself version output
         id: semver
-        run: ./gradlew printSemver -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=snapshot --githubOutput --no-scan
+        run: ./gradlew printSemver -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=snapshot --githubOutput --no-scan -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish next version to MavenLocal
-        run: ./gradlew publishToMavenLocal -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=snapshot --no-scan
+        run: ./gradlew publishToMavenLocal -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=snapshot --no-scan -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Check format
         continue-on-error: true
         run: |
           itselfVersion=${{ steps.semver.outputs.semver }}
-          ./gradlew checkFormat -P itselfVersion=$itselfVersion -P semver.stage=beta --no-scan
+          ./gradlew checkFormat -P itselfVersion=$itselfVersion -P semver.stage=beta --no-scan -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Build
         run: |
           itselfVersion=${{ steps.semver.outputs.semver }}
-          ./gradlew build -P itselfVersion=$itselfVersion -P semver.stage=beta -x checkFormat -x spotlessCheck -x spotlessKotlinCheck
+          ./gradlew build -P itselfVersion=$itselfVersion -P semver.stage=beta -x checkFormat -x spotlessCheck -x spotlessKotlinCheck -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled

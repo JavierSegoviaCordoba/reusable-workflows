@@ -112,7 +112,7 @@ jobs:
 
       - name: Set project versions as outputs
         id: semver-outputs
-        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false --no-scan
+        run: ./gradlew ${{ inputs.project-path }}printSemver --githubOutput ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -Psemver.stage=${{ inputs.stage }} -Psemver.scope=${{ inputs.scope }} -Psemver.checkClean=false --no-scan -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Set PUBLISH_VERSION output
         shell: kotlin -howtorun .main.kts {0}
@@ -142,7 +142,7 @@ jobs:
           path: '**/build/reports/**'
 
       - name: Patch Changelog and regenerate README badges
-        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }} -P semver.checkClean=false
+        run: ./gradlew patchChangelog mergeChangelog writeReadmeBadges ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }} -P semver.checkClean=false -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Commit
         uses: JavierSegoviaCordoba/reusable-workflows/actions/commit@main
@@ -150,7 +150,7 @@ jobs:
           commit-message: 'Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}'
 
       - name: Generate Tag
-        run: ./gradlew createSemverTag ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }}
+        run: ./gradlew createSemverTag ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Push
         run: git push --follow-tags

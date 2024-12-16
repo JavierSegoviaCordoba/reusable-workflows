@@ -165,7 +165,7 @@ jobs:
         run: ${{ inputs.run_before_args }}
 
       - name: Build
-        run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }}
+        run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish test reports
         uses: mikepenz/action-junit-report@62516aa379bff6370c95fd5894d5a27fb6619d9b # v5.2.0
@@ -190,7 +190,7 @@ jobs:
 
       - name: Update Sonar
         if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
-        run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }}
+        run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
     # if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
@@ -248,11 +248,11 @@ jobs:
         uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
 
       - name: Publish snapshot
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish snapshot with tag prefix 2
         if: ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two != 'null' }}
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache
+        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   deploy-docs:
     #    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
@@ -287,10 +287,10 @@ jobs:
 
       - name: Set semver as output
         id: semver
-        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -P semver.stage=snapshot --no-scan
+        run: ./gradlew printSemver --githubOnlyRoot --githubOutput -P semver.stage=snapshot --no-scan -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Generate docs
-        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-scan --no-configuration-cache
+        run: ./gradlew buildSite ${{ inputs.gradle-args-build-docs }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-scan --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Deploy all docs to GitHub Pages
         if: (inputs.publish-all-docs == 'true')
