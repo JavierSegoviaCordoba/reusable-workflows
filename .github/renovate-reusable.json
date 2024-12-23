@@ -1,47 +1,5 @@
 {
   "extends": [
-    "config:base",
-    "helpers:pinGitHubActionDigests"
-  ],
-  "assignees": [
-    "JavierSegoviaCordoba"
-  ],
-  "assigneesFromCodeOwners": true,
-  "automerge": true,
-  "automergeType": "pr",
-  "branchConcurrentLimit": 2,
-  "commitBodyTable": true,
-  "packageRules": [
-    {
-      "matchPackagePatterns": [
-        "androidx.compose.*"
-      ],
-      "groupName": "androidx.compose.*"
-    },
-    {
-      "matchPackagePatterns": [
-        "com.android.*"
-      ],
-      "groupName": "com.android.*"
-    },
-    {
-      "matchPackagePatterns": [
-        "io.kotest.*"
-      ],
-      "groupName": "io.kotest.*"
-    },
-    {
-      "matchPackagePatterns": [
-        "io.ktor.*"
-      ],
-      "groupName": "io.ktor.*"
-    }
-  ],
-  "platformAutomerge": true,
-  "prConcurrentLimit": 1,
-  "rebaseWhen": "never",
-  "reviewers": [
-    "JavierSegoviaCordoba"
-  ],
-  "reviewersFromCodeOwners": true
+    "github>JavierSegoviaCordoba/renovate//renovate.json5"
+  ]
 }

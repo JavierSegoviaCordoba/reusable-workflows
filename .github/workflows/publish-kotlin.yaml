@@ -175,25 +175,24 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
+        uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       # TODO: Workaround for https://github.com/gradle/gradle/issues/30213?notification_referrer_id=NT_kwDOAHHijLMxMTk5Mjg4Mjg3Nzo3NDYzNTY0#issuecomment-2302398137
       - name: Cache JGit
-        id: cache-jgit
-        uses: actions/cache@1bd1e32a3bdc45362d1e726936510720a7c30a57 # v4
+        uses: JavierSegoviaCordoba/actions/github/cache@main
         with:
           path: '~/.config/jgit/config'
-          key: ${{ runner.os }}-jgit
+          key: '${{ runner.os }}-jgit'
 
       - name: Kotlin native cache
         if: inputs.restore-kotlin-native-cache == true
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
+        uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Set up Java
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-java@main
+        uses: JavierSegoviaCordoba/actions/java/setup@main
 
       - name: Set up Gradle
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
+        uses: JavierSegoviaCordoba/actions/gradle/setup@main
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -202,11 +201,11 @@ jobs:
       - name: Set up Xcode
         # TODO: Fix watchOS simulator. Disable if not necessary.
         # if: 'false'
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
+        uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Set up Python
         if: startsWith(matrix.os, 'macos-latest')
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
+        uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Run before
         run: ${{ inputs.run_before_args }}
@@ -222,7 +221,7 @@ jobs:
 
       - name: Upload reports
         if: ${{ failure() }}
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/upload-artifact@main
+        uses: JavierSegoviaCordoba/actions/github/upload/artifact@main
         with:
           name: 'reports-${{ matrix.os }}'
           path: 'build/reports'
@@ -238,14 +237,14 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
+        uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Kotlin native cache
         if: inputs.restore-kotlin-native-cache == true
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
+        uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Update Qodana
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/qodana@main
+        uses: JavierSegoviaCordoba/actions/qodana@main
 
   publish:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]')))
@@ -267,17 +266,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
+        uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Kotlin native cache
         if: inputs.restore-kotlin-native-cache == true
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
+        uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Set up Java
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-java@main
+        uses: JavierSegoviaCordoba/actions/java/setup@main
 
       - name: Set up Gradle
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
+        uses: JavierSegoviaCordoba/actions/gradle/setup@main
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -286,11 +285,11 @@ jobs:
       - name: Set up Xcode
         # TODO: Fix watchOS simulator. Disable if not necessary.
         # if: 'false'
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-xcode@main
+        uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Set up Python
         if: startsWith(matrix.os, 'macos-latest')
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-python@main
+        uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
@@ -313,17 +312,17 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
+        uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Kotlin native cache
         if: inputs.restore-kotlin-native-cache == true
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/kotlin-native-cache@main
+        uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Set up Java
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-java@main
+        uses: JavierSegoviaCordoba/actions/java/setup@main
 
       - name: Set up Gradle
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/setup-gradle@main
+        uses: JavierSegoviaCordoba/actions/gradle/setup@main
         with:
           cache-enabled: ${{ inputs.gradle-cache }}
           cache-encryption-key: ${{ secrets.GRADLE_ENCRYPTION_KEY }}
@@ -333,7 +332,7 @@ jobs:
         run: ./gradlew buildSite -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} --no-scan --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Deploy docs to GitHub Pages
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/github-pages-deploy@main
+        uses: JavierSegoviaCordoba/actions/github/pages/deploy@main
         with:
           folder: 'build/docs/_site'
           single-commit: true
@@ -351,10 +350,10 @@ jobs:
 
     steps:
       - name: Checkout
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/checkout@main
+        uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Publish GitHub Release
-        uses: JavierSegoviaCordoba/reusable-workflows/actions/github-release@main
+        uses: JavierSegoviaCordoba/actions/github/release/publish@main
         with:
           changelog-file: '${{ inputs.changelog-file }}'
           github-token: '${{ secrets.GITHUB_TOKEN }}'
