@@ -4,12 +4,14 @@ description: 'Action for uploading an artifact'
 
 inputs:
   name:
+    default: 'artifact'
     description: 'Name of the artifact'
     required: true
-    default: 'artifact'
+    type: string
   path:
     description: 'Path to the artifact'
     required: true
+    type: string
 
 runs:
   using: "composite"

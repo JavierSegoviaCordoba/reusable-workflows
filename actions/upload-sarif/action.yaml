@@ -6,6 +6,7 @@ inputs:
   sarif_file:
     description: 'Path to SARIF file'
     required: true
+    type: string
 
 runs:
   using: "composite"
