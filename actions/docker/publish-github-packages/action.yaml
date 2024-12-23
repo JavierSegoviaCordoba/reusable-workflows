@@ -1,0 +1,57 @@
+name: 'Publish Docker Container to GitHub Packages'
+
+description: 'Publish Docker Container to GitHub Packages'
+
+inputs:
+  github-token:
+    description: 'GitHub Personal Access Token (PAT)'
+    required: true
+    default: ${{ github.token }}
+    type: string
+  image-name:
+    description: 'Docker image name'
+    required: true
+    type: string
+  image-version:
+    description: 'Docker image version'
+    required: true
+    type: string
+  username:
+    description: 'GitHub username or email'
+    default: ${{ github.actor }}
+    required: true
+    type: string
+runs:
+  using: "composite"
+
+  steps:
+    - name: 🐙 Publish Docker Container to GitHub Packages
+      shell: bash
+      run: |
+        repo_owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+        repo_name=$(basename "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        image_name=${{ inputs.image-name }}
+        image_version=${{ inputs.image-version }}
+        username=${{ inputs.username }}
+        
+        echo "Repo owner: ${repo_owner}"
+        echo "Repo name: ${repo_name}"
+        echo "Image name: ${image_name}"
+        echo "Image version: ${image_version}"
+        echo "Username: ${username}"
+        
+        echo "🔨 Building the Docker image ..."
+        docker build -t ${image_name} .
+        echo "🔨 Docker image built ✅"
+        
+        echo "🔑 Logging into GitHub Packages ..."
+        echo ${{ inputs.github-token }} | docker login ghcr.io -u ${username} --password-stdin
+        echo "🔑 Logged into GitHub Packages ✅"
+        
+        echo "🏷️ Creating the image tag ..."
+        docker tag ${image_name} ghcr.io/${repo_owner}/${repo_name}:${image_version}
+        echo "🏷️ Image tag created ✅"
+        
+        echo "🚀 Pushing the image to GitHub Packages ..."
+        docker push ghcr.io/${repo_owner}/${repo_name}:${image_version}
+        echo "🚀 Docker image pushed to GitHub Packages ✅"
