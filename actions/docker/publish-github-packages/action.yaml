@@ -1,0 +1,50 @@
+name: 'Publish Docker Container to GitHub Packages'
+
+description: 'Publish Docker Container to GitHub Packages'
+
+inputs:
+  github-token:
+    description: 'GitHub Personal Access Token (PAT)'
+    required: true
+    default: ${{ github.token }}
+    type: string
+  image-name:
+    description: 'Docker image name'
+    required: true
+    type: string
+  image-version:
+    description: 'Docker image version'
+    required: true
+    type: string
+  username:
+    description: 'GitHub username or email'
+    default: ${{ github.actor }}
+    required: true
+    type: string
+runs:
+  using: "composite"
+
+  steps:
+    - name: 🐳 Build and push Docker images
+      uses: JavierSegoviaCordoba/reusable-workflows/actions/docker/build-push-action@main
+
+    - name: 🐙 Publish Docker Container to GitHub Packages
+      shell: bash
+      run: |
+        repo_owner=$(echo "${{ github.repository_owner }}" | tr '[:upper:]' '[:lower:]')
+        repo=$(echo "${{ github.repository }}" | tr '[:upper:]' '[:lower:]')
+        image_name=${{ inputs.image-name }}
+        image_version=${{ inputs.image-version }}
+        username=${{ inputs.username }}
+        
+        echo "🔨 Building the Docker image"
+        docker build -t $image_name .
+        
+        echo "🔑 Logging into GitHub Packages"
+        echo ${{ inputs.github-token }} | docker login ghcr.io -u ${username} --password-stdin
+        
+        echo "🏷️ Create the image tag"
+        docker tag ${image_name} ghrc.io/${repo_owner}/${repo}:${image_version}
+        
+        echo: "🚀 Push the image to GitHub Packages"
+        docker push ghcr.io/${repo_owner}/${repo}:${image_version}
