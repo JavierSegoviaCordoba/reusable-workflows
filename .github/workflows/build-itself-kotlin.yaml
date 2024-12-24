@@ -31,7 +31,7 @@ env:
 
 jobs:
   build-itself:
-    if: (!contains(github.triggering_actor, '[bot]'))
+    if: (!contains(github.triggering_actor, '[bot]') || github.event_name != 'pull_request')
 
     runs-on: ${{ matrix.os }}
 

@@ -114,7 +114,13 @@ env:
 
 jobs:
   build:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.build)
+    if: |
+      (inputs.build) &&
+      (
+        inputs.allow-github-actor-bots == 'true' ||
+        !contains(github.triggering_actor, '[bot]') ||
+        github.event_name != 'pull_request'
+      )
 
     runs-on: ${{ matrix.os }}
 
@@ -135,7 +141,7 @@ jobs:
           key: '${{ runner.os }}-jgit'
 
       - name: Kotlin native cache
-        if: inputs.restore-kotlin-native-cache == true
+        if: inputs.restore-kotlin-native-cache == 'true'
         uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Set up Java
@@ -186,11 +192,17 @@ jobs:
           path: '**/build/reports/configuration-cache'
 
       - name: Update Sonar
-        if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
+        if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true')
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
+    if: |
+      (inputs.code-quality-check == 'true') &&
+      (
+        inputs.allow-github-actor-bots == 'true' ||
+        !contains(github.triggering_actor, '[bot]') ||
+        github.event_name != 'pull_request'
+      )
 
     runs-on: ubuntu-latest
 
@@ -199,7 +211,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Kotlin native cache
-        if: inputs.restore-kotlin-native-cache == true
+        if: inputs.restore-kotlin-native-cache == 'true'
         uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Update Qodana
@@ -207,12 +219,13 @@ jobs:
 
   publish-snapshot:
     if: |
+      (inputs.publish-snapshot == 'true') &&
       !cancelled() && 
       !failure() &&
       (
-        (inputs.allow-github-actor-bots == true || !contains(github.triggering_actor, '[bot]')) &&
-        (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
-        (inputs.publish-snapshot == true || inputs.publish-snapshot == 'true')
+        inputs.allow-github-actor-bots == 'true' ||
+        !contains(github.triggering_actor, '[bot]') ||
+        github.event_name != 'pull_request'
       )
 
     needs: [ build ]
@@ -229,7 +242,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Kotlin native cache
-        if: inputs.restore-kotlin-native-cache == true
+        if: inputs.restore-kotlin-native-cache == 'true'
         uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Set up Java
@@ -255,7 +268,13 @@ jobs:
         run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   deploy-docs:
-    if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && ((github.event_name == 'push') || (github.event_name == 'workflow_dispatch')) && (inputs.deploy-docs == true || inputs.deploy-docs == 'true')
+    if: |
+      (inputs.deploy-docs == 'true') &&
+      (
+        inputs.allow-github-actor-bots == 'true' ||
+        !contains(github.triggering_actor, '[bot]') ||
+        github.event_name != 'pull_request'
+      )
 
     needs: [ code-quality-check, publish-snapshot ]
 
@@ -271,7 +290,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/git/checkout@main
 
       - name: Kotlin native cache
-        if: inputs.restore-kotlin-native-cache == true
+        if: inputs.restore-kotlin-native-cache == 'true'
         uses: JavierSegoviaCordoba/actions/kotlin/cache/native@main
 
       - name: Set up Java
