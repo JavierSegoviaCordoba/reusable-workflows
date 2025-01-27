@@ -146,7 +146,7 @@ jobs:
       - name: Commit
         uses: JavierSegoviaCordoba/actions/git/commit@main
         with:
-          commit-message: 'Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}'
+          message: 'Publish ${{ steps.semver.outputs.PUBLISH_VERSION }}'
 
       - name: Generate Tag
         run: ./gradlew createSemverTag ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
