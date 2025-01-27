@@ -90,8 +90,16 @@ jobs:
           push: true
           force: true
 
+      - name: Find Pull Request number
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && github.head_ref == 'renovate/all-dependencies' }}
+        id: pull-request-number
+        uses: JavierSegoviaCordoba/actions/github/pull-request/find@main
+        with:
+          branch: 'renovate/all-dependencies'
+
       - name: Auto Approve
-        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) }}
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && steps.pull-request-number.outputs.number != '' && steps.pull-request-number.outputs.number != null }}
         uses: JavierSegoviaCordoba/actions/github/pull-request/auto-approve@main
         with:
           github-token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
+          pull-request-number: ${{ steps.pull-request-number.outputs.number }}
