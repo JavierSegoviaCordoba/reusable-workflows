@@ -91,7 +91,7 @@ jobs:
           force: true
 
       - name: Find Pull Request number
-        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && github.head_ref == 'renovate/all-dependencies' }}
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && contains(github.head_ref, 'renovate/all-dependencies') }}
         id: pull-request-number
         uses: JavierSegoviaCordoba/actions/github/pull-request/find@main
         with:
