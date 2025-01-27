@@ -208,7 +208,8 @@ jobs:
         uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Run before
-        run: ${{ inputs.run_before_args }}
+        if: ${{ inputs.run_before_args != '' && inputs.run_before_args != null }}
+        run: ${{ inputs.run_before_args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Build
         run: ./gradlew build -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled

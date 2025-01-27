@@ -164,8 +164,8 @@ jobs:
         uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Run before
-        if: ${{ inputs.run_before_args != 'null' }}
-        run: ${{ inputs.run_before_args }}
+        if: ${{ inputs.run_before_args != '' && inputs.run_before_args != null }}
+        run: ${{ inputs.run_before_args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Build
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
