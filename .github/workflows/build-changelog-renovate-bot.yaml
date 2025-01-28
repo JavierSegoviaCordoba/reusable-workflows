@@ -90,16 +90,24 @@ jobs:
           push: true
           force: true
 
+      - name: Print ref name
+        run: |
+          echo "Ref name: ${{ github.ref_name }}"
+
       - name: Find Pull Request number
-        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && contains(github.head_ref, 'renovate/all-dependencies') }}
-        id: pull-request-number
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && contains(github.ref_name, 'renovate/') }}
+        id: pull-request
         uses: JavierSegoviaCordoba/actions/github/pull-request/find@main
         with:
-          branch: 'renovate/all-dependencies'
+          branch: ${{ github.ref_name }}
+
+      - name: Print Pull Request number
+        run: |
+          echo 'Pull request number #${{ steps.pull-request.outputs.number }}'
 
       - name: Auto Approve
-        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && steps.pull-request-number.outputs.number != '' && steps.pull-request-number.outputs.number != null }}
+        if: ${{ (inputs.auto-approve == 'true' || inputs.auto-approve == true) && steps.pull-request.outputs.number != '' && steps.pull-request.outputs.number != null }}
         uses: JavierSegoviaCordoba/actions/github/pull-request/auto-approve@main
         with:
           github-token: '${{ secrets.TOKEN_GITHUB_ACTION }}'
-          pull-request-number: ${{ steps.pull-request-number.outputs.number }}
+          pull-request-number: ${{ steps.pull-request.outputs.number }}

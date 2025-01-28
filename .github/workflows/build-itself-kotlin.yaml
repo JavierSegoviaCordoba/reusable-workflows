@@ -19,7 +19,7 @@ on:
         type: boolean
       run_before_args:
         description: 'Gradle args for `Run before` step'
-        default: 'null'
+        default: ''
         required: false
         type: string
     secrets:
