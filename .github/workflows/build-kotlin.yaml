@@ -12,6 +12,11 @@ on:
         default: true
         required: false
         type: boolean
+      debug:
+        description: 'Enable debug information'
+        default: false
+        required: false
+        type: boolean
       restore-kotlin-native-cache:
         description: 'Restore Kotlin cache, `~/.konan` directory'
         default: true
@@ -130,6 +135,26 @@ jobs:
         os: [ 'ubuntu-latest', 'windows-latest', 'macos-latest' ]
 
     steps:
+      - name: 🐛 Debug info
+        if: inputs.debug == true
+        run: |
+          echo "(inputs.build)"
+          echo "${{ (inputs.build) }}"
+          echo "(inputs.allow-github-actor-bots == 'true')"
+          echo "${{ (inputs.allow-github-actor-bots == 'true') }}"
+          echo "(!contains(github.triggering_actor, '[bot]'))"
+          echo "${{ (!contains(github.triggering_actor, '[bot]')) }}"
+          echo "(github.event_name != 'pull_request')"
+          echo "${{ (github.event_name != 'pull_request') }}"
+          echo "(matrix.os)"
+          echo "${{ (matrix.os) }}"
+          echo "(inputs.run-sonar-linux == 'true')"
+          echo "${{ (inputs.run-sonar-linux == 'true') }}"
+          echo "(inputs.run-sonar-linux == true)"
+          echo "${{ (inputs.run-sonar-linux == true) }}"
+          echo "(startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)"
+          echo "${{ (startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true) }}"
+
       - name: Checkout
         uses: JavierSegoviaCordoba/actions/git/checkout@main
 
@@ -192,7 +217,7 @@ jobs:
           path: '**/build/reports/configuration-cache'
 
       - name: Update Sonar
-        if: (matrix.os == 'ubuntu-') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
+        if: (startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:

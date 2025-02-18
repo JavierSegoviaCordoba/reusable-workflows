@@ -7,6 +7,11 @@ concurrency:
 on:
   workflow_call:
     inputs:
+      debug:
+        description: 'Enable debug information'
+        default: false
+        required: false
+        type: boolean
       code-coverage-report:
         description: 'Enable code coverage report'
         default: true
@@ -148,7 +153,13 @@ jobs:
       tag-prefix: ${{ steps.tag-prefix.outputs.tag-prefix }}
 
     steps:
-      - name: Calculate tag prefix output
+      - name: 🐛 Debug info
+        if: inputs.debug == true
+        run: |
+          echo "((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]')))"
+          echo "${{ ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) }}"
+
+      - name: 📱 Calculate tag prefix output
         id: tag-prefix
         run: |
           echo "github.ref_name: ${{ github.ref_name }}"
@@ -174,6 +185,14 @@ jobs:
         os: [ 'macos-latest', 'ubuntu-latest', 'windows-latest' ]
 
     steps:
+      - name: 🐛 Debug info
+        if: inputs.debug == true
+        run: |
+          echo "matrix.os"
+          echo "${{ matrix.os }}"
+          echo "(startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)"
+          echo "${{ (startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true) }}"
+
       - name: Checkout
         uses: JavierSegoviaCordoba/actions/git/checkout@main
 
@@ -228,7 +247,7 @@ jobs:
           path: 'build/reports'
 
       - name: Update Sonar
-        if: (matrix.os == 'ubuntu-') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
+        if: (startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
