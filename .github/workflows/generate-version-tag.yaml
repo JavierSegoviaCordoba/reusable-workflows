@@ -106,7 +106,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Set up Python
-        if: startsWith(matrix.os, 'macos-latest')
+        if: startsWith(matrix.os, 'macos-')
         uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Set project versions as outputs

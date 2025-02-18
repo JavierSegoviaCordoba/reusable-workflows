@@ -204,7 +204,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Set up Python
-        if: startsWith(matrix.os, 'macos-latest')
+        if: startsWith(matrix.os, 'macos-')
         uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Run before
@@ -228,13 +228,13 @@ jobs:
           path: 'build/reports'
 
       - name: Update Sonar
-        if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
+        if: (matrix.os == 'ubuntu-') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: Checkout
@@ -289,7 +289,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Set up Python
-        if: startsWith(matrix.os, 'macos-latest')
+        if: startsWith(matrix.os, 'macos-')
         uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Publish to MavenCentral

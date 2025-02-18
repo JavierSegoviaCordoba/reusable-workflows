@@ -160,7 +160,7 @@ jobs:
         uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Set up Python
-        if: startsWith(matrix.os, 'macos-latest')
+        if: startsWith(matrix.os, 'macos-')
         uses: JavierSegoviaCordoba/actions/python/setup@main
 
       - name: Run before
@@ -192,7 +192,7 @@ jobs:
           path: '**/build/reports/configuration-cache'
 
       - name: Update Sonar
-        if: (matrix.os == 'ubuntu-latest') && (inputs.run-sonar-linux == 'true')
+        if: (matrix.os == 'ubuntu-') && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
         run: ./gradlew sonar ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
@@ -204,7 +204,7 @@ jobs:
         github.event_name != 'pull_request'
       )
 
-    runs-on: ubuntu-latest
+    runs-on: 'ubuntu-latest'
 
     steps:
       - name: Checkout
