@@ -291,11 +291,11 @@ jobs:
         uses: JavierSegoviaCordoba/actions/xcode/setup@main
 
       - name: Publish snapshot
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
+        run: ./gradlew publishToMavenCentral ${{ inputs.gradle-args-publish-snapshot }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish snapshot with tag prefix 2
         if: ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two != 'null' }}
-        run: ./gradlew publishToSonatype ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
+        run: ./gradlew publishToMavenCentral ${{ inputs.gradle-args-publish-snapshot-tag-prefix-two }} ${{ inputs.gradle-args }} -P semver.stage=snapshot --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   deploy-docs:
     if: |
