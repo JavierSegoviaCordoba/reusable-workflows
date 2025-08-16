@@ -248,7 +248,8 @@ jobs:
 
       - name: Update Sonar
         if: (startsWith(matrix.os, 'ubuntu-')) && (inputs.run-sonar-linux == 'true' || inputs.run-sonar-linux == true)
-        run: ./gradlew sonar -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
+        # TODO: Remove `--no-parallel` when the issue is resolved: https://community.sonarsource.com/t/error-when-running-sonar-task-with-gradle-9-0-0-rc-1/143857/17
+        run: ./gradlew sonar --no-parallel -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-sonar }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
   code-quality-check:
     if: ((inputs.allow-github-actor-bots == true) || (!contains(github.triggering_actor, '[bot]'))) && (inputs.code-quality-check == true)
