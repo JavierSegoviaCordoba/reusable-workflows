@@ -320,7 +320,7 @@ jobs:
       - name: Publish to MavenCentral
         if: (inputs.publish-maven-central == true)
 #        run: ./gradlew publishAndReleaseToMavenCentral -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }} --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
-        run: ./gradlew publishToMavenCentral -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }} --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
+        run: ./gradlew publishToMavenCentral -P publishing.sign=true -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args-publish-maven-central }} ${{ inputs.gradle-args }} --no-configuration-cache -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish to Gradle Plugin Portal
         if: (inputs.publish-gradle-plugin-portal == true)
