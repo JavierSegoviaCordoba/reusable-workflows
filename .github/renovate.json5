@@ -1,8 +1,8 @@
 {
   extends: [
-    "github>JavierSegoviaCordoba/renovate//renovate.json5",
+    'github>JavierSegoviaCordoba/renovate//renovate.json5',
   ],
-  baseBranches: [
-    "main",
-  ]
+  baseBranchPatterns: [
+    'main',
+  ],
 }
