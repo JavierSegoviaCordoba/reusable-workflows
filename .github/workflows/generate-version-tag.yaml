@@ -130,6 +130,12 @@ jobs:
           val githubOutputFile = java.io.File(System.getenv("GITHUB_OUTPUT"))
           githubOutputFile.appendText("\nPUBLISH_VERSION=$version")
 
+      - name: Set tag workflow summary
+        run: |
+          echo "## Version Tag Generated 🚀" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "**Tag:** \`${{ inputs.tag-prefix }}${{ steps.semver.outputs.PUBLISH_VERSION }}\`" >> $GITHUB_STEP_SUMMARY
+
       # - name: Build
       #   run: ./gradlew build ${{ inputs.gradle-args }} -P semver.tagPrefix=${{ inputs.tag-prefix }} -P semver.stage=${{ inputs.stage }} -P semver.scope=${{ inputs.scope }}
 
