@@ -196,7 +196,7 @@ jobs:
         run: ./gradlew build ${{ inputs.gradle-args-build }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish test reports
-        uses: mikepenz/action-junit-report@5e05ac00ad0604dfb7e313ae412aa3284f4906d6 # v6.3.0
+        uses: mikepenz/action-junit-report@49b2ca06f62aa7ef83ae6769a2179271e160d8e4 # v6.3.1
         if: success() || failure()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
