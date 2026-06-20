@@ -234,7 +234,7 @@ jobs:
         run: ./gradlew build -P semver.tagPrefix=${{ needs.tag-prefix.outputs.tag-prefix }} ${{ inputs.gradle-args }} -P org.jetbrains.dokka.experimental.gradle.pluginMode=V2Enabled
 
       - name: Publish test reports
-        uses: mikepenz/action-junit-report@3a81627bfac62268172037048872e8ebd4207e6d # v6.4.1
+        uses: mikepenz/action-junit-report@d9f48fc87bc235f7e214acf696ca5abc0a986f16 # v6.4.2
         if: success() || failure()
         with:
           report_paths: '**/build/test-results/**/TEST-*.xml'
